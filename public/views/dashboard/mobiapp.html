@@ -1,0 +1,57 @@
+<!-- BEGIN PAGE BREADCRUMB -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="#/">Home</a><i class="fa fa-circle"></i>
+    </li>
+    <li class="active" ng-bind="active">
+
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMB -->
+<!-- BEGIN PAGE CONTENT INNER -->
+<div class="row">
+    <div class="col-md-12" ng-show="flash.status">
+        <div class="alert alert-{{flash.class}} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{{flash.type}}</strong> {{flash.message}}
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="portlet light">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-university font-green-sharp"></i>
+                    <span class="caption-subject font-green-sharp bold uppercase">App</span>
+                </div>
+                <div class="inputs">
+                    <div class="portlet-input input-medium input-inline">
+                        <div class="input-icon right">
+                            <i class="icon-magnifier"></i>
+                            <input type="text" class="form-control form-control-solid" placeholder="search..." ng-model="query">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="schema in schema_classnames.classes" ng-init="load_classinfo(schema_classnames.applicationId, schema_classnames.javascriptKey, schema_classnames.masterKey, schema.className)">
+                        <a class="dashboard-stat dashboard-stat-light blue-madison" href="#/class/{{schema.className}}">
+                            <div class="visual">
+                                <i class="fa fa-university fa-icon-medium"></i>
+                            </div>
+                            <div class="details" ng-repeat="info in class_info" ng-if="info.classname == schema.className">
+                                <div class="number">
+                                    <strong>{{info.info.length}}</strong>
+                                </div>
+                                <div class="desc">
+                                    Total <strong>{{info.classname}}</strong>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END PORTLET-->

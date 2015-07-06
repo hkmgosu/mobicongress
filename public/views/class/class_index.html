@@ -1,0 +1,111 @@
+<!-- BEGIN PAGE BREADCRUMB -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="#/">Home</a><i class="fa fa-circle"></i>
+    </li>
+    <li class="active" ng-bind="active">
+
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMB -->
+<!-- BEGIN PAGE CONTENT INNER -->
+<div class="row">
+    <div class="col-md-12" ng-show="flash.status">
+        <div class="alert alert-{{flash.class}} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{{flash.type}}</strong> {{flash.message}}
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="portlet light">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-university font-green-sharp"></i>
+                    <span class="caption-subject font-green-sharp bold uppercase">New {{classname}}</span>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="remove">
+                    </a>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="panel-group accordion scrollable" id="accordion1">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+							<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" data-target="#new_{{classname}}">
+							<strong>New {{classname}}</strong><small> </small></a>
+							</h4>
+                        </div>
+                        <div id="new_{{classname}}" class="panel-collapse collapse">
+                            <div class="panel-body" ng-include="'views/class/class_form.html'">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="portlet light">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-university font-green-sharp"></i>
+                    <span class="caption-subject font-green-sharp bold uppercase">All {{class.classname}}</span>
+                </div>
+                <div class="inputs">
+                    <div class="portlet-input input-medium input-inline">
+                        <div class="input-icon right">
+                            <i class="icon-magnifier"></i>
+                            <input type="text" class="form-control form-control-solid" placeholder="search..." ng-model="query">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 			<div class="portlet-title">
+				<ul class="list-inline">
+					<li>
+					    <ui-select ng-model="class_order.selected" theme="select2" ng-disabled="disabled">
+						    <ui-select-match placeholder="Order by" allow-clear="false">{{$select.selected.column}}</ui-select-match>
+						    <ui-select-choices repeat="class_order in class_orders">
+						      <div ng-bind-html="class_order.column | highlight: $select.search"></div>
+						    </ui-select-choices>
+						</ui-select>
+					</li>
+					<li>
+						<label class="radio-inline"><input type="radio"  value="+" ng-model="sort" ng-init="sort='+'">Asc</label>
+						<label class="radio-inline"><input type="radio" value="-" ng-model="sort">Desc</label>
+					</li>
+					<li class="pull-right">
+						<label>Show: </label>
+						<select class="form-group" ng-model="quantity" ng-init="quantity=5">
+							<option value="5">5</option>
+							<option value="10">10</option>
+							<option value="20">20</option>
+							<option value="{{class_rows.length}}">All</option>
+						</select>
+					</li>
+				</ul>
+			</div>	 -->
+            <div class="portlet-body">
+                <div class="panel-group accordion scrollable" id="accordion2">
+                    <div class="panel panel-default" ng-repeat="row in class_rows.info | filter: query | orderBy: [class_config.find.title]">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+							<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" data-target="#{{row.objectId}}">
+							<strong>{{row[class_config.find.title]}} </strong>- {{row[class_config.find.subTitle]}}</a>
+							</h4>
+                        </div>
+                        <div id="{{row.objectId}}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <ul class="list-group">
+                                    <h4>Details</h4>
+                                    <li class="list-group-item" ng-repeat="(key , value) in row"><strong>{{key}}: </strong> {{value}}</li>
+                                </ul>
+                                <a class="btn btn-default" href="#/class/edit/{{classname}}/{{row.objectId}}">Edit</a>
+                                <input value="Delete" class="btn btn-default" type="button" ng-click="delete_class_row(row.objectId)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

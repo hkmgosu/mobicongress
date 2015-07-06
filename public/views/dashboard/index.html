@@ -1,0 +1,96 @@
+<!-- BEGIN PAGE BREADCRUMB -->
+<ul class="page-breadcrumb breadcrumb">
+    <li>
+        <a href="#/">Home</a><i class="fa fa-circle"></i>
+    </li>
+    <li class="active" ng-bind="active">
+
+    </li>
+</ul>
+<!-- END PAGE BREADCRUMB -->
+<!-- BEGIN PAGE CONTENT INNER -->
+<div class="row">
+    <div class="col-md-12" ng-show="flash.status">
+        <div class="alert alert-{{flash.class}} alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <strong>{{flash.type}}</strong> {{flash.message}}
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="portlet light">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-university font-green-sharp"></i>
+                    <span class="caption-subject font-green-sharp bold uppercase">Apps</span>
+                </div>
+                <div class="inputs">
+                    <div class="portlet-input input-medium input-inline">
+                        <div class="input-icon right">
+                            <i class="icon-magnifier"></i>
+                            <input type="text" class="form-control form-control-solid" placeholder="search..." ng-model="query">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="portlet-title">
+                <ul class="list-inline">
+                    <li>
+                        <ui-select ng-model="mapp.selected" theme="select2" ng-disabled="disabled" style="width: 200px;">
+                            <ui-select-match placeholder="Order by" allow-clear="false">{{$select.selected.appName}}</ui-select-match>
+                            <ui-select-choices repeat="mapp in mapps">
+                                <div ng-bind-html="mapp.appName | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                    </li>
+                    <li>
+                        <label class="radio-inline">
+                            <input type="radio" value="+" ng-model="sort" ng-init="sort='+'">Asc</label>
+                        <label class="radio-inline">
+                            <input type="radio" value="-" ng-model="sort">Desc</label>
+                    </li>
+                    <li class="pull-right">
+                        <label>Show: </label>
+                        <select class="form-group" ng-model="quantity" ng-init="quantity=20">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="{{mapps.length}}">All</option>
+                        </select>
+                    </li>
+                </ul>
+            </div>
+            <div class="portlet-body">
+                <div class="panel-group accordion scrollable" id="accordion2">
+                    <div class="panel panel-default" ng-repeat="mapp in mapps | filter: query | limitTo: quantity | orderBy: sort+event_order.selected.name">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+							<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" data-target="#{{mapp.applicationId}}">
+							<strong>{{mapp.appName}} </strong>- {{mapp.dashboardURL}}</a>
+							</h4>
+                        </div>
+                        <div id="{{mapp.applicationId}}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="portlet light">
+                                    <div class="portlet-title">
+                                        <h5>
+												<i class="fa fa-university"></i>
+												<span class="caption-subject bold uppercase">App Details</span>
+											</h5>
+                                    </div>
+                                    <div class? "portlet-body">
+                                        <ul class="list-group" ng-repeat="(title, val) in mapp">
+                                            <li class="list-group-item"><strong>{{title}}: </strong> {{val}}</li>
+                                        </ul>
+                                        <a class="btn btn-default" href="#/mobiapps/{{mapp.applicationId}}">Load</a>
+                                        <input value="Delete" class="btn btn-default" type="button" ng-click="delete_mapp(mapp.applicationId)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END PAGE CONTENT INNER -->
