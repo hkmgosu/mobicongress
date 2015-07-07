@@ -186,16 +186,6 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
         $scope.class_config = data.config.web;
     });
 
-    // $http.get('/api/places').
-    //    	success(function(data, status, headers, config) {
-    //      		$scope.places = data;
-    //    });
-
-    //   $scope.clear = function() {
-    //    $scope.place.selected = undefined;
-    //  };
-
-
     $scope.class_order = {};
 
     $scope.class_orders = [{
@@ -237,31 +227,6 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
     }
 
-    $scope.user = [];
-    $scope.$root.roles = [{
-        "active": true,
-        "color1": "#f2f2f2",
-        "color2": "#d5d5d5",
-        "color3": "#1a1a1a",
-        "color4": "#eb0014",
-        "color5": "#555555",
-        "paletteName": "meeting",
-        "objectId": "U6G8gZaB2l",
-        "createdAt": "2015-04-14T01:04:18.929Z",
-        "updatedAt": "2015-04-15T20:41:21.432Z"
-    }, {
-        "active": true,
-        "color1": "#f2f2f2",
-        "color2": "#d5d5d5",
-        "color3": "#1a1a1a",
-        "color4": "#eb0014",
-        "color5": "#555555",
-        "paletteName": "meeting",
-        "objectId": "U6G8gZaB2l",
-        "createdAt": "2015-04-14T01:04:18.929Z",
-        "updatedAt": "2015-04-15T20:41:21.432Z"
-    }];
-
     $scope.class_new_row = [];
     $scope.create_class_row = function() {
 
@@ -296,62 +261,8 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
         //                message: data
         //            };
         //        });
-
-
-        $scope.people = [{
-            name: 'Adam',
-            email: 'adam@email.com',
-            age: 12,
-            country: 'United States'
-        }, {
-            name: 'Amalie',
-            email: 'amalie@email.com',
-            age: 12,
-            country: 'Argentina'
-        }, {
-            name: 'Estefanía',
-            email: 'estefania@email.com',
-            age: 21,
-            country: 'Argentina'
-        }, {
-            name: 'Adrian',
-            email: 'adrian@email.com',
-            age: 21,
-            country: 'Ecuador'
-        }, {
-            name: 'Wladimir',
-            email: 'wladimir@email.com',
-            age: 30,
-            country: 'Ecuador'
-        }, {
-            name: 'Samantha',
-            email: 'samantha@email.com',
-            age: 30,
-            country: 'United States'
-        }, {
-            name: 'Nicole',
-            email: 'nicole@email.com',
-            age: 43,
-            country: 'Colombia'
-        }, {
-            name: 'Natasha',
-            email: 'natasha@email.com',
-            age: 54,
-            country: 'Ecuador'
-        }, {
-            name: 'Michael',
-            email: 'michael@email.com',
-            age: 15,
-            country: 'Colombia'
-        }, {
-            name: 'Nicolás',
-            email: 'nicolas@email.com',
-            age: 43,
-            country: 'Colombia'
-        }];
-
-
-        $scope.multipleDemo = [];
+	
+		console.log($scope.class_new_row);
 
     };
 
