@@ -154,7 +154,6 @@ exports.class_find_rows = function(req, res) {
 
 
             var web_config = results[0];
-            console.log(web_config);
             var clobj = parse.Object.extend(req.body.classname);
             var query = new parse.Query(clobj);
             query.limit(1000);
@@ -184,25 +183,22 @@ exports.class_find_rows = function(req, res) {
 exports.class_new_row = function(req, res) {
 
     if (req.isAuthenticated()) {
-        var Event = parse.Object.extend("Event");
-        var new_event = new Event();
-
-        new_event.set("title", req.body.title);
-        new_event.set("detail", req.body.detail);
-        new_event.set("start", new Date(req.body.start));
-        new_event.set("end", new Date(req.body.end));
-
-        new_event.save(null, {
-            success: function(data) {
-                // Execute any logic that should take place after the object is saved.
-                res.json('New object created with objectId: ' + data.id);
-            },
-            error: function(data, error) {
-                // Execute any logic that should take place if the save fails.
-                // error is a Parse.Error with an error code and message.
-                res.json('Failed to create new object, with error code: ' + error.message);
-            }
-        });
+  		parse.User.logOut();
+        var Clobj = parse.Object.extend(req.body.classname);
+        var new_row = new Clobj();
+		
+		_.each(req.body.info, function(value, key){
+			new_row.set(key, value);
+		});
+		
+		new_row.save().then(function(data) {
+                res.json(data);
+            }, function(error) {
+                res.json("Error: " + error.code + " " + error.message);
+            });
+		
+		//res.json(req.body);
+        
 
     } else {
         res.json('/signin');

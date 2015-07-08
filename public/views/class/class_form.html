@@ -18,7 +18,7 @@
         </div>
         <div class="portlet-body form">
             <!-- BEGIN FORM-->
-            <form class="form-horizontal form-bordered" method="POST" ng-submit="" validate>
+            <form class="form-horizontal form-bordered" method="POST" ng-submit="create_class_row(classname)" validate>
                 <div class="form-body">
                     <div class="form-group" ng-repeat="(name, value) in class_config.create">
                         <label class="control-label col-md-3">{{name | capitalize}}</label>
@@ -48,7 +48,7 @@
                         </div>
                         <div class="col-md-6" ng-if="value.type == 'Number'">
                             <div class="input-icon right">
-                                <input type="number" class="form-control" ng-model="class_new_row[name]">
+                                <input type="number" class="form-control" ng-model="class_new_row[classname][name]">
                                 <p>se guardara como: {{class_new_row[classname][name]}}</p>
                             </div>
                         </div>
@@ -84,7 +84,7 @@
                             <div class="col-md-offset-3 col-md-9">
                                 <!-- <button type="button" class="btn default">Cerrar</button> -->
                                 <button type="submit" class="btn blue-madison"><i class="fa fa-check"></i> Crear</button>
-                                <button type="button" class="btn" ng-click="create_class_row()">Prueba</button>
+                                <button type="button" class="btn" ng-click="clear_class_row()">Prueba</button>
                             </div>
                         </div>
                     </div>

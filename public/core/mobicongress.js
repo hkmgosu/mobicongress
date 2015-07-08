@@ -228,41 +228,46 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
     }
 
     $scope.class_new_row = [];
-    $scope.create_class_row = function() {
+    $scope.create_class_row = function(name) {
+		
+       $http.post('/api/class_new_row',{ classname: name, info: $scope.class_new_row[name] }).
+       success(function(data, status, headers, config) {
+			
+		   console.log(data);
+		   
+           $rootScope.flash = {
+               status: true,
+               class: 'success',
+               type: 'SUCCESS!',
+               message: data
+           };
+		   
+		   $scope.class_new_row = [];
 
-        //        $http.post('/api/class_new_row', this.class_new_row).
-        //        success(function(data, status, headers, config) {
-        //
-        //            console.log(data);
-        //            console.log(status);
-        //
-        //            $rootScope.flash = {
-        //                status: true,
-        //                class: 'success',
-        //                type: 'SUCCESS!',
-        //                message: data
-        //            };
-        //
-        //            $http.get('/api/class_get').
-        //            success(function(data, status, headers, config) {
-        //                $scope.events = data;
-        //            });
-        //
-        //            this.events_new = {};
-        //
-        //        }).
-        //        error(function(data, status, headers, config) {
-        //            console.log(data || "Request failed");
-        //            console.log(status);
-        //            $rootScope.flash = {
-        //                status: true,
-        //                class: 'danger',
-        //                type: 'ERROR!',
-        //                message: data
-        //            };
-        //        });
+           $http.post('/api/class_find_rows', {
+           	classname: $routeParams.classname
+           }).
+           success(function(data, status, headers, config) {
+           	$scope.class_rows = data;
+           	$scope.class_config = data.config.web;
+           });
+
+           
+		   
+		   
+
+       }).
+       error(function(data, status, headers, config) {
+           console.log(data || "Request failed");
+           console.log(status);
+           $rootScope.flash = {
+               status: true,
+               class: 'danger',
+               type: 'ERROR!',
+               message: data
+           };
+       });
 	
-		console.log($scope.class_new_row);
 
     };
 
