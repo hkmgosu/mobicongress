@@ -89,11 +89,14 @@
 			</div>	 -->
 			<div class="portlet-body">
 				<div class="panel-group accordion scrollable" id="accordion2">
-					<div class="panel panel-default" ng-repeat="row in class_rows.info | filter: query | orderBy: [class_config.find.title]">
+					<div class="panel panel-default" ng-repeat="row in class_rows.info | filter: query | orderBy: [class_config.find.title.name]">
 						<div class="panel-heading">
 							<h4 class="panel-title">
 							<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" data-target="#{{row.objectId}}">
-							<strong>{{row[class_config.find.title]}} </strong>- {{row[class_config.find.subTitle]}}</a>
+							<strong>{{row[class_config.find.title.name]}} </strong>- 
+								<span ng-if="class_config.find.subTitle.type === 'Date'">{{row[class_config.find.subTitle.name].iso | date: 'short'}}</span>
+								<span ng-if="class_config.find.subTitle.type !== 'Date'">{{row[class_config.find.subTitle.name]}}</span>
+								</a>
 							</h4>
 						</div>
 						<div id="{{row.objectId}}" class="panel-collapse collapse">
@@ -103,7 +106,7 @@
 									<li class="list-group-item" ng-repeat="(key , value) in row"><strong>{{key}}: </strong> {{value}}</li>
 								</ul>
 								<a class="btn btn-default" href="#/class/edit/{{classname}}/{{row.objectId}}">Edit</a>
-								<input value="Delete" class="btn btn-default" type="button" ng-click="delete_class_row(row.objectId)">
+								<input value="Delete" class="btn btn-default" type="button" ng-click="delete_class_row(row.objectId, classname)">
 							</div>
 						</div>
 					</div>

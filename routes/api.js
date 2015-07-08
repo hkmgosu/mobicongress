@@ -183,28 +183,28 @@ exports.class_find_rows = function(req, res) {
 exports.class_new_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		/*   		parse.User.logOut();
+		parse.User.logOut();
         var Clobj = parse.Object.extend(req.body.classname);
-        var new_row = new Clobj(); */
+        var new_row = new Clobj();
 
 		_.each(req.body.info, function(value, key) {
 			//new_row.set(key, value);
 			if (_.has(value, "value")) {
-				if (value.type == 'String') {
-					console.log(key + ' ' + value.value);
-				} else if (value.type == 'Date') {
-					console.log(key + ' ' + new Date(value.value));
-				} else if (value.type == 'Pointer') {
-					console.log(key + ' ' + value.value.objectId);
+				if (value.type == 'String' && value.value !== null) {
+					new_row.set(key, value.value);
+				} else if (value.type == 'Date' && value.value !== null) {
+					new_row.set(key, new Date(value.value));
+				} else if (value.type == 'Pointer' && value.value !== null) {
+					new_row.set(key,{"__type": value.type, "className": value.targetClass,"objectId": value.value.objectId});
 				}
 			}
 		});
 
-		/* 		new_row.save().then(function(data) {
+		new_row.save().then(function(data) {
                 res.json(data);
             }, function(error) {
                 res.json("Error: " + error.code + " " + error.message);
-            }); */
+            });
 
 		//res.json(req.body);
 
@@ -254,14 +254,14 @@ exports.class_update_row = function(req, res) {
 exports.class_delete_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		var Event = parse.Object.extend("Event");
-		var query = new parse.Query(Event);
+		var Clobj = parse.Object.extend(req.body.classname);
+		var query = new parse.Query(Clobj);
 
-		query.get(req.body.event_id, {
+		query.get(req.body.object_id, {
 			success: function(data) {
 				// Execute any logic that should take place after the object is saved.
 				data.destroy({});
-				res.json('Deleted objectId: ' + req.body.event_id);
+				res.json('Deleted objectId: ' + req.body.object_id);
 			},
 			error: function(data, error) {
 				// Execute any logic that should take place if the save fails.
