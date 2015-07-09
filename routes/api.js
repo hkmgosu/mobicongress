@@ -184,8 +184,8 @@ exports.class_new_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
 		parse.User.logOut();
-        var Clobj = parse.Object.extend(req.body.classname);
-        var new_row = new Clobj();
+		var Clobj = parse.Object.extend(req.body.classname);
+		var new_row = new Clobj();
 
 		_.each(req.body.info, function(value, key) {
 			//new_row.set(key, value);
@@ -195,16 +195,22 @@ exports.class_new_row = function(req, res) {
 				} else if (value.type == 'Date' && value.value !== null) {
 					new_row.set(key, new Date(value.value));
 				} else if (value.type == 'Pointer' && value.value !== null) {
-					new_row.set(key,{"__type": value.type, "className": value.targetClass,"objectId": value.value.objectId});
+					new_row.set(key, {
+						"__type": value.type,
+						"className": value.targetClass,
+						"objectId": value.value
+					});
+				} else {
+					console.log("No controlado" + key + ' ' + value);
 				}
 			}
 		});
 
 		new_row.save().then(function(data) {
-                res.json(data);
-            }, function(error) {
-                res.json("Error: " + error.code + " " + error.message);
-            });
+			res.json(data);
+		}, function(error) {
+			res.json("Error: " + error.code + " " + error.message);
+		});
 
 		//res.json(req.body);
 

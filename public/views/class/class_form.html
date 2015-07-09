@@ -52,7 +52,7 @@
                                 <p>se guardara como: {{class_new_row[classname][name]}}</p>
                             </div>
                         </div>
-                        <div class="col-md-6" ng-if="value.type == 'Date'">
+                        <div class="col-md-4" ng-if="value.type == 'Date'">
                             <div class="input-icon right">
                                 <input type="datetime-local" class="form-control" ng-model="class_new_row[classname][name].value" ng-init="class_new_row[classname][name].type = value.type">
                                 <p>se guardara como: {{class_new_row[classname][name]}}</p>
@@ -60,24 +60,26 @@
                         </div>
                         <div class="col-md-6" ng-if="value.type == 'Pointer'" ng-init="loadSelect(value.targetClass, '')">
                             <ui-select ng-model="class_new_row[classname][name].value" theme="select2" ng-disabled="disabled" style="width: 50%" ng-init="class_new_row[classname][name] = {targetClass: value.targetClass,type: value.type}">
-                                <ui-select-match placeholder="Select {{value.targetClass}}" allow-clear="true">{{$select.selected[selectConfig[value.targetClass].title]}}</ui-select-match>
-                                <ui-select-choices repeat="item in selectChoices[value.targetClass] | filter: $select.search">
-                                    <div ng-bind-html="item[selectConfig[value.targetClass].title] | highlight: $select.search"></div>
-                                    <small>{{item[selectConfig[value.targetClass].subTitle]}}</small>
+                                <ui-select-match placeholder="Select {{value.targetClass}}" allow-clear="true">{{$select.selected[selectConfig[value.targetClass].title.name]}}</ui-select-match>
+                                <ui-select-choices repeat="item.objectId as item in selectChoices[value.targetClass] | filter: $select.search">
+                                    <div ng-bind-html="item[selectConfig[value.targetClass].title.name] | highlight: $select.search"></div>
+                                    <small>{{item[selectConfig[value.targetClass].subTitle.name]}}</small>
                                 </ui-select-choices>
                             </ui-select>
                             <p>{{class_new_row[classname][name]}}</p>
                         </div>
                         <div class="col-md-6" ng-if="value.type == 'Array'" ng-init="loadSelect(value.targetClass, value.type)">
-							<textarea rows="5" class="form-control" ng-model="class_new_row[classname][name].value" ng-init="class_new_row[classname][name] = {targetClass: value.targetClass,type: value.type}"></textarea>
-							<p>{{class_new_row[classname][name]}}</p>
-<!--                             <ui-select multiple ng-model="MultiChoices" theme="select2" style="width: 100%;">
-                                <ui-select-match placeholder="Select choices...">{{$item}}
+							<!--  <textarea rows="5" class="form-control" ng-model="class_new_row[classname][name].value" ng-init="class_new_row[classname][name] = {targetClass: value.targetClass,type: value.type}"></textarea>
+							 -->
+                           <ui-select multiple ng-model="class_new_row[classname][name].value" theme="select2" style="width: 100%;" ng-init="class_new_row[classname][name] = {targetClass: value.targetClass,type: value.type}">
+                                <ui-select-match placeholder="Select choices...">{{$item.person.objectId}} ({{$item.charge}})
                                 </ui-select-match>
-                                <ui-select-choices repeat="item in selectMultipleChoices | filter: $select.search">
-                                    <div ng-bind-html="item | highlight: $select.search"></div>
+                                <ui-select-choices repeat="item.objectId as item in selectMultipleChoices | filter: $select.search">
+                                    <div ng-bind-html="item.person.objectId | highlight: $select.search"></div>
+									<small>{{item.charge}}</small>
                                 </ui-select-choices>
-                            </ui-select> -->
+                            </ui-select>
+							<p>{{class_new_row[classname][name]}}</p>
                         </div>
                     </div>
                     <div class="form-actions">

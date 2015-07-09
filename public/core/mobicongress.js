@@ -218,10 +218,9 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			}).
 			success(function(data, status, headers, config) {
 				if (type == 'Array') {
-					$scope.selectMultipleChoices.push({
-						classname: name,
-						info: data.info
-					});
+					for (var i = 0; i < data.info.length; i++) {
+						$scope.selectMultipleChoices.push(data.info[i]);
+					}
 					$scope.selectConfig[name] = data.config.web.find;
 				} else {
 					$scope.selectConfig[name] = data.config.web.find;
