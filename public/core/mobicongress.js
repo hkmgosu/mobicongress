@@ -97,7 +97,7 @@ app.controller("HomeController", ["$scope", "$rootScope", "$location", "$http",
 	function($scope, $rootScope, $location, $http) {
 
 		$rootScope.title = "Mobicongress | Dashboard";
-		$rootScope.page_title = "Application Title";
+		$rootScope.page_title = "Parse Apps";
 		$rootScope.page_desc = "...";
 		$rootScope.active = "dashboard";
 
@@ -121,6 +121,12 @@ app.controller("HomeController", ["$scope", "$rootScope", "$location", "$http",
 app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routeParams",
 	function($scope, $rootScope, $http, $routeParams) {
 
+		$rootScope.title = "Mobicongress | MobiApps";
+		$rootScope.page_title = "Classes";
+		$rootScope.page_desc = "...";
+		$rootScope.active = "MobiApp";
+		
+		
 		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).
 		success(function(data, status, headers, config) {
 			$scope.schema_classnames = data;
@@ -181,7 +187,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$rootScope.title = "Mobicongress | " + $routeParams.classname;
 		$rootScope.page_title = "Class: " + $routeParams.classname;
 		$rootScope.page_desc = $routeParams.classname + " de la Aplicación";
-		$rootScope.active = "";
+		$rootScope.active = $routeParams.classname;
 
 		$scope.classname = $routeParams.classname;
 

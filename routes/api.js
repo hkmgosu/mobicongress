@@ -201,7 +201,7 @@ exports.class_new_row = function(req, res) {
 						"objectId": value.value
 					});
 				} else {
-					console.log("No controlado" + key + ' ' + value);
+					console.log("No controlado: " + key + ' ' + value);
 				}
 			}
 		});
