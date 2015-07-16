@@ -38,7 +38,7 @@ app.config(function($routeProvider, uiSelectConfig) {
 
 app.filter('capitalize', function() {
 	return function(input, scope) {
-		if (input != null)
+		if (input !== null)
 			input = input.toLowerCase();
 		return input.substring(0, 1).toUpperCase() + input.substring(1);
 	}
@@ -149,7 +149,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 
 		$scope.load_classinfo = function(app_id, js_key, master_key, cname) {
 
-			console.log(cname);
+			//console.log(cname);
 
 			$http.post('/api/class_find_rows/', {
 				applicationId: app_id,
@@ -159,7 +159,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 			}).
 			success(function(data, status, headers, config) {
 				transform(data);
-				console.log(data);
+				//console.log(data);
 			}).
 			error(function(data, status, headers, config) {
 				console.log(data || "Request failed");
@@ -217,20 +217,28 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$scope.selectChoices = [];
 		$scope.selectConfig = [];
 		$scope.selectMultipleChoices = [];
-		$scope.loadSelect = function(name, type) {
+		$scope.loadSelect = function(name, type, include) {
 
 			$http.post('/api/class_find_rows', {
-				classname: name
+				classname: name,
+				includes: include
 			}).
 			success(function(data, status, headers, config) {
 				if (type == 'Array') {
-					for (var i = 0; i < data.info.length; i++) {
-						$scope.selectMultipleChoices.push(data.info[i]);
+					for (var i = 0; i < data.classdata.length; i++) {
+						for(var j = 0; j < include.length; j++){
+							if(include[j] == data.classdata[i].includes[j].classname){
+								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
+								delete data.classdata[i].includes;
+								$scope.selectMultipleChoices.push(data.classdata[i].classdata);
+							}
+						}
 					}
 					$scope.selectConfig[name] = data.config.web.find;
+					console.log($scope.selectMultipleChoices);
 				} else {
 					$scope.selectConfig[name] = data.config.web.find;
-					$scope.selectChoices[name] = data.info;
+					$scope.selectChoices[name] = data.classdata;
 				}
 
 			}).

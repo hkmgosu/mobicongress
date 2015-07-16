@@ -31,5 +31,7 @@ router.post('/api/class_update_row/:object_id', users.requiresLogin, api.class_u
 
 router.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
 
+router.get('/api/prueba/', api.prueba);
+
 
 module.exports = router;

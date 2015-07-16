@@ -21,8 +21,8 @@ exports.mobiapps = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": "enfer.sur.moi@gmail.com",
-				"X-Parse-Password": "iori0316",
+				"X-Parse-Email": "",
+				"X-Parse-Password": "",
 				"Content-Type": "application/json"
 
 			} // request headers 
@@ -146,6 +146,7 @@ exports.class_find_rows = function(req, res) {
 
 	if (req.isAuthenticated()) {
 		parse.User.logOut();
+		var classData = [];
 
 		var Core = parse.Object.extend("Core");
 		var query = new parse.Query(Core);
@@ -156,16 +157,56 @@ exports.class_find_rows = function(req, res) {
 			var web_config = results[0];
 			var clobj = parse.Object.extend(req.body.classname);
 			var query = new parse.Query(clobj);
-			query.limit(1000);
-			query.find().then(function(data) {
-				res.json({
-					classname: req.body.classname,
-					config: web_config,
-					info: data
+
+
+			if (_.has(req.body, "includes")) {
+				if (req.body.includes.length !== 0) {
+					query.include(req.body.includes);
+					query.limit(1000);
+					query.find().then(function(data) {
+
+						for (var i = 0; i < data.length; i++) {
+							classData.push({
+								classdata: data[i],
+								includes: []
+							});
+							for (var j = 0; j < req.body.includes.length; j++) {
+								classData[i].includes.push({
+									classname: req.body.includes[j],
+									classdata: data[i].get(req.body.includes[j])
+								});
+								//console.log(classData[i].includes);
+							}
+						}
+
+
+						res.json({
+							classname: req.body.classname,
+							config: web_config,
+							classdata: classData
+						});
+
+
+
+					}, function(error) {
+						res.json("Error: " + error.code + " " + error.message);
+					});
+				}
+			} else {
+				query.limit(1000);
+				query.find().then(function(data) {
+					classData = data;
+					res.json({
+						classname: req.body.classname,
+						config: web_config,
+						info: classData
+					});
+
+				}, function(error) {
+					res.json("Error: " + error.code + " " + error.message);
 				});
-			}, function(error) {
-				res.json("Error: " + error.code + " " + error.message);
-			});
+			}
+
 
 
 
@@ -175,6 +216,27 @@ exports.class_find_rows = function(req, res) {
 	} else {
 		res.redirect('/signin');
 	}
+
+};
+
+exports.prueba = function(req, res) {
+
+	parse.User.logOut();
+	var results;
+	var includes = ['apunta'];
+
+	var Prueba = new parse.Object.extend("Prueba");
+	var query = new parse.Query(Prueba);
+	query.include(includes);
+
+	query.find().then(function(data) {
+		_.each(data, function(value, key) {
+			if (key == includes[0]) {
+				value = value.get('apunta');
+			}
+		});
+		res.json(data);
+	});
 
 };
 
