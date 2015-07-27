@@ -21,8 +21,8 @@ exports.mobiapps = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": "",
-				"X-Parse-Password": "",
+				"X-Parse-Email": "evolutionaimagos@gmail.com",
+				"X-Parse-Password": "mobicongress0199",
 				"Content-Type": "application/json"
 
 			} // request headers 
@@ -57,8 +57,8 @@ exports.mobiapps_get = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": "enfer.sur.moi@gmail.com",
-				"X-Parse-Password": "iori0316",
+				"X-Parse-Email": "evolutionaimagos@gmail.com",
+				"X-Parse-Password": "mobicongress0199",
 				"Content-Type": "application/json"
 
 			} // request headers 
@@ -91,11 +91,6 @@ exports.mobiapps_get = function(req, res) {
 									className: value.className
 								});
 						}
-					});
-
-					var cn = _.sortBy(className, function(value) {
-						return value.className;
-
 					});
 
 					res.json({
@@ -146,13 +141,11 @@ exports.class_find_rows = function(req, res) {
 
 	if (req.isAuthenticated()) {
 		parse.User.logOut();
-		var classData = [];
 
 		var Core = parse.Object.extend("Core");
 		var query = new parse.Query(Core);
 		query.equalTo("class", req.body.classname);
 		query.find().then(function(results) {
-
 
 			var web_config = results[0];
 			var clobj = parse.Object.extend(req.body.classname);
@@ -160,16 +153,19 @@ exports.class_find_rows = function(req, res) {
 
 
 			if (_.has(req.body, "includes")) {
-				if (req.body.includes.length !== 0) {
-					query.include(req.body.includes);
-					query.limit(1000);
-					query.find().then(function(data) {
 
-						for (var i = 0; i < data.length; i++) {
-							classData.push({
-								classdata: data[i],
-								includes: []
-							});
+				var classData = [];
+				query.include(req.body.includes);
+				query.limit(1000);
+				query.find().then(function(data) {
+
+					for (var i = 0; i < data.length; i++) {
+						classData.push({
+							classdata: data[i],
+							includes: []
+						});
+
+						if (req.body.includes.length !== 0) {
 							for (var j = 0; j < req.body.includes.length; j++) {
 								classData[i].includes.push({
 									classname: req.body.includes[j],
@@ -178,28 +174,28 @@ exports.class_find_rows = function(req, res) {
 								//console.log(classData[i].includes);
 							}
 						}
+					}
 
-
-						res.json({
-							classname: req.body.classname,
-							config: web_config,
-							classdata: classData
-						});
-
-
-
-					}, function(error) {
-						res.json("Error: " + error.code + " " + error.message);
-					});
-				}
-			} else {
-				query.limit(1000);
-				query.find().then(function(data) {
-					classData = data;
 					res.json({
 						classname: req.body.classname,
 						config: web_config,
-						info: classData
+						classdata: classData
+					});
+
+
+
+				}, function(error) {
+					res.json("Error: " + error.code + " " + error.message);
+				});
+
+			} else {
+				query.limit(1000);
+				query.find().then(function(data) {
+
+					res.json({
+						classname: req.body.classname,
+						config: web_config,
+						classdata: data
 					});
 
 				}, function(error) {
@@ -262,8 +258,18 @@ exports.class_new_row = function(req, res) {
 						"className": value.targetClass,
 						"objectId": value.value
 					});
-				} else {
-					console.log("No controlado: " + key + ' ' + value);
+				} else if (value.type == 'Array' && value.value !== null) {
+					if (value.value.length > 0) {
+						var tempArray = [];
+						for (var i = 0; i < value.value.length; i++) {
+							tempArray.push({
+								"__type": value.type,
+								"className": value.targetClass,
+								"objectId": value.value[0]
+							});
+						}
+						new_row.set(key, tempArray);
+					}
 				}
 			}
 		});

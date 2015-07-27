@@ -1,4 +1,3 @@
-"use strict";
 
 var app = angular.module('mobicongress', ['ngSanitize', 'ui.select', 'ngRoute']);
 
@@ -34,6 +33,10 @@ app.config(function($routeProvider, uiSelectConfig) {
 	.otherwise({
 		redirectTo: '/'
 	});
+});
+
+app.factory('_', function() {
+	return window._; // assumes underscore has already been loaded on the page
 });
 
 app.filter('capitalize', function() {
@@ -125,78 +128,58 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 		$rootScope.page_title = "Classes";
 		$rootScope.page_desc = "...";
 		$rootScope.active = "MobiApp";
+		$scope.schema_data = [];
+		$scope.hide_contain = true;
+		$scope.loading = 0;
 		
-		
-		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).
-		success(function(data, status, headers, config) {
-			$scope.schema_classnames = data;
-
-		}).
-		error(function(data, status, headers, config) {
-			console.log(data || "Request failed");
-			console.log(status);
-			$rootScope.flash = {
-				status: true,
-				class: 'danger',
-				type: 'ERROR!',
-				message: data
-			};
-		});
-
-
-
-		$scope.class_info = [];
-
-		$scope.load_classinfo = function(app_id, js_key, master_key, cname) {
-
-			//console.log(cname);
-
-			$http.post('/api/class_find_rows/', {
-				applicationId: app_id,
-				masterKey: master_key,
-				javascriptKey: js_key,
-				classname: cname
-			}).
-			success(function(data, status, headers, config) {
-				transform(data);
-				//console.log(data);
-			}).
-			error(function(data, status, headers, config) {
-				console.log(data || "Request failed");
-				console.log(status);
-				$rootScope.flash = {
-					status: true,
-					class: 'danger',
-					type: 'ERROR!',
-					message: data
-				};
+		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).then(function(result) {
+		  //console.log(result);
+		  return result.data;
+		}).then(function(result) {
+			
+			var total = result.classes.length;
+			var i = 0;
+			
+		  	 _.each(result.classes, function(value,key){
+				$http.post('/api/class_find_rows/', {
+					applicationId: result.applicationId,
+					masterKey: result.masterKey,
+					javascriptKey: result.javascriptKey,
+					classname: value.className
+				}).then(function(result){
+					$scope.schema_data.push(result.data);
+					i++;
+					$scope.loading = (i*100)/total;
+					if(i == total) $scope.hide_contain = false;
+				});	
 			});
-
-			var transform = function(data) {
-				$scope.class_info.push(data);
-			}
-		};
-
-
+			
+		});
+		
 	}
 ]);
 
-app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter',
-	function($scope, $rootScope, $location, $http, $routeParams, $filter) {
+app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_',
+	function($scope, $rootScope, $location, $http, $routeParams, $filter, _) {
 
 		$rootScope.title = "Mobicongress | " + $routeParams.classname;
 		$rootScope.page_title = "Class: " + $routeParams.classname;
 		$rootScope.page_desc = $routeParams.classname + " de la Aplicación";
 		$rootScope.active = $routeParams.classname;
-
 		$scope.classname = $routeParams.classname;
+
+/* 		$scope.isString = function(item) {
+			return angular.isString(item);
+		} */
 
 		$http.post('/api/class_find_rows', {
 			classname: $routeParams.classname
 		}).
 		success(function(data, status, headers, config) {
 			$scope.class_rows = data;
-			$scope.class_config = data.config.web;
+			$scope.class_config = data.config;
+			
+			console.log(data.config.prueba);
 		});
 
 		$scope.class_order = {};
@@ -212,34 +195,30 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			column: 'End'
 		}];
 
-		$scope.item = [];
-		$scope.MultiChoices = [];
 		$scope.selectChoices = [];
-		$scope.selectConfig = [];
-		$scope.selectMultipleChoices = [];
-		$scope.loadSelect = function(name, type, include) {
+		$scope.loadSelect = function(name, include) {
 
 			$http.post('/api/class_find_rows', {
 				classname: name,
 				includes: include
 			}).
 			success(function(data, status, headers, config) {
-				if (type == 'Array') {
-					for (var i = 0; i < data.classdata.length; i++) {
-						for(var j = 0; j < include.length; j++){
-							if(include[j] == data.classdata[i].includes[j].classname){
+
+				$scope.selectChoices[name] = [];
+				for (var i = 0; i < data.classdata.length; i++) {
+					if (include.length > 0) {
+						for (var j = 0; j < include.length; j++) {
+							if (include[j] == data.classdata[i].includes[j].classname) {
 								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
 								delete data.classdata[i].includes;
-								$scope.selectMultipleChoices.push(data.classdata[i].classdata);
+								$scope.selectChoices[name].push(data.classdata[i].classdata);
 							}
 						}
+					} else {
+						$scope.selectChoices[name].push(data.classdata[i].classdata);
 					}
-					$scope.selectConfig[name] = data.config.web.find;
-					console.log($scope.selectMultipleChoices);
-				} else {
-					$scope.selectConfig[name] = data.config.web.find;
-					$scope.selectChoices[name] = data.classdata;
 				}
+
 
 			}).
 			error(function(data, status, headers, config) {
@@ -268,14 +247,14 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 					message: data
 				};
 
-				$scope.class_new_row = [];
+				//$scope.class_new_row = [];
 
 				$http.post('/api/class_find_rows', {
 					classname: $routeParams.classname
 				}).
 				success(function(data, status, headers, config) {
 					$scope.class_rows = data;
-					$scope.class_config = data.config.web;
+					$scope.class_config = data.config;
 				});
 
 			}).
@@ -314,7 +293,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 				}).
 				success(function(data, status, headers, config) {
 					$scope.class_rows = data;
-					$scope.class_config = data.config.web;
+					$scope.class_config = data.config;
 				});
 
 			}).

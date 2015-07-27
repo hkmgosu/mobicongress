@@ -34,21 +34,25 @@
             </div>
             <div class="portlet-body">
                 <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="schema in schema_classnames.classes | filter: query" ng-init="load_classinfo(schema_classnames.applicationId, schema_classnames.javascriptKey, schema_classnames.masterKey, schema.className)">
-                        <a class="dashboard-stat dashboard-stat-light blue-madison" href="#/class/{{schema.className}}">
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="class in schema_data | filter: query | orderBy: 'classname'" ng-hide="hide_contain">
+                        <a class="dashboard-stat dashboard-stat-light blue-madison" href="#/class/{{class.classname}}">
                             <div class="visual">
                                 <i class="fa fa-university fa-icon-medium"></i>
                             </div>
-                            <div class="details" ng-repeat="info in class_info" ng-if="info.classname == schema.className">
+                            <div class="details">
                                 <div class="number">
-                                    <strong>{{info.info.length}}</strong>
+                                    <strong>{{class.classdata.length}}</strong>
                                 </div>
                                 <div class="desc">
-                                    Total <strong>{{info.classname}}</strong>
+                                    Total <strong>{{class.classname}}</strong>
                                 </div>
                             </div>
                         </a>
                     </div>
+					<div class="progress">
+					  <div class="progress-bar" role="progressbar" style="width: {{loading}}%;">
+					  </div>
+					</div>
                 </div>
             </div>
         </div>
