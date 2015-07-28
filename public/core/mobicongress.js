@@ -179,7 +179,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			$scope.class_rows = data;
 			$scope.class_config = data.config;
 			
-			console.log(data.config.prueba);
+			//console.log(data.config.prueba);
 		});
 
 		$scope.class_order = {};

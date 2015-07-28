@@ -125,9 +125,9 @@ exports.core_config = function(req, res) {
 
 		var Core = parse.Object.extend("Core");
 		var query = new parse.Query(Core);
-		query.equalTo("class", req.body.classname);
+		//query.equalTo("class", req.body.classname);
 		query.find().then(function(results) {
-
+			res.json({config: results});
 		});
 
 	} else {

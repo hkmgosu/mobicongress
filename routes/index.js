@@ -21,6 +21,8 @@ router.get('/api/getuser', users.requiresLogin, users.getUser);
 
 router.get('/api/mobiapps', users.requiresLogin, api.mobiapps);
 
+router.get('/api/core_config', users.requiresLogin, api.core_config);
+
 router.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
 
 router.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);

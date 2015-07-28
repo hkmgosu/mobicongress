@@ -22,9 +22,8 @@ var ParseStrategy = require('passport-parse');
 
 //parse
 var parse = require('parse').Parse;
-parse.User.enableRevocableSession();
 parse.initialize(config.parse.appId, config.parse.jsKey, config.parse.masterKey);
-
+parse.User.enableRevocableSession();
 
 var parseStrategy = new ParseStrategy({
     parseClient: parse

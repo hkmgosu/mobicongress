@@ -117,14 +117,16 @@
 									<li class="list-group-item" ng-repeat="(key , value) in row" ng-if="key != 'createdAt' && key != 'objectId' && key != 'updatedAt'"><strong>{{key}}: </strong> 
 										<span ng-repeat="classConfig in class_config.find.details">	
 											<span ng-if="classConfig.type == 'String' && classConfig.name == key">{{value}}</span>
+											<span ng-if="classConfig.type == 'Number' && classConfig.name == key">{{value}}</span>
 											<span ng-if="classConfig.type == 'Boolean' && classConfig.name == key">{{value}}</span>
 											<span ng-if="classConfig.type == 'GeoPoint' && classConfig.name == key">{{value}}</span>
-											<span ng-if="classConfig.type == 'File' && classConfig.name == key">{{value}}</span>
+											<span ng-if="classConfig.type == 'File' && classConfig.name == key"><a href="{{value.url}}" target="_blank">ver archivo</a></span>
 											<span ng-if="classConfig.type == 'Date' && classConfig.name == key">{{value.iso | date: 'short'}}</span>
 											<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key">
 												<span ng-repeat="(kk,vv) in selectChoices[classConfig.targetClass]">
 													<span ng-repeat="title in classConfig.show.title.values" ng-if="value.objectId == vv.objectId">{{vv[title.columnName]}} </span>
-													<span ng-repeat="subTitle in classConfig.show.sbTitle.values" ng-if="value.objectId == vv.objectId">{{vv[subTitle.columnName]}}</span>
+													<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType === 'file'"><a href="{{vv[subTitle.columnName].url}}" target="_blank">ver archivo</a></span>
+													<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
 												</span>
 											</span>
 											<span ng-if="classConfig.type == 'Array' && classConfig.name == key">
