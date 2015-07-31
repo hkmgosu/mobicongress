@@ -3,10 +3,17 @@
 /**
  * Module dependencies.
  */
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
-var app = require('../app');
+var mongoose = require('../config/mongoose');
+var express = require('../config/app');
+var passport = require('../config/passport');
 var debug = require('debug')('angularejs:server');
 var http = require('http');
+
+var db = mongoose();
+var app = express();
+var passport = passport();
 
 /**
  * Get port from environment and store in Express.
@@ -28,6 +35,8 @@ var server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+console.log('servidor ON');
 
 /**
  * Normalize a port into a number, string, or false.

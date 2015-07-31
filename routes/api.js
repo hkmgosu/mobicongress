@@ -1,5 +1,5 @@
 var parse = require('parse').Parse;
-var config = require('../config');
+var config = require('../config/config');
 var passport = require('passport');
 var _ = require('underscore');
 var moment = require('moment-timezone');

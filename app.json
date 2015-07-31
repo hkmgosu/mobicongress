@@ -1,6 +1,6 @@
 {
   "name": "mobicongress",
-  "description": "A barebones Node.js app using Express 4",
+  "description": "dashboard de mobicongress",
   "repository": "",
   "logo": "http://node-js-sample.herokuapp.com/node.svg",
   "keywords": ["node", "express", "static"]

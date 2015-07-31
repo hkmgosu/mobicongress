@@ -1,39 +1,72 @@
 var express = require('express');
-var router = express.Router();
-var users = require('./users');
+var users = require('../controllers/dashusers.server.controller');
 var flash = require('connect-flash');
 var passport = require('passport');
 var api = require('./api');
 
-
 /* GET home page. */
-router.get('/', users.requiresLogin, function(req, res, next) {
+/* app.get('/', users.requiresLogin, function(req, res, next) {
     if (!req.isAuthenticated()) {
         res.redirect('/signin');
     } else {
+		if(req.session.lastVisit){
+			console.log(req.session.lastVisit);
+		}
+		req.session.lastVisit = new Date();
         res.render('index', {
             message: req.flash('success')
         });
     }
-});
+}); */
 
-router.get('/api/getuser', users.requiresLogin, users.getUser);
+module.exports = function(app){
+	
+	/* 	app.route('/signup')
+	.get(users.renderSignup)
+	.post(users.signup); */
 
-router.get('/api/mobiapps', users.requiresLogin, api.mobiapps);
+	app.get('/', users.requiresLogin, function(req, res, next) {
+		if (!req.isAuthenticated()) {
+			res.redirect('/signin');
+		} else {
+			if(req.session.lastVisit){
+				console.log(req.session.lastVisit);
+			}
+			req.session.lastVisit = new Date();
+			res.render('index', {
+				message: req.flash('success')
+			});
+		}
+	});
 
-router.get('/api/core_config', users.requiresLogin, api.core_config);
+	//Configurar las routes 'signin'
+	app.route('/signin')
+		.get(users.renderSignin)
+		.post(passport.authenticate('local', {
+		successRedirect: '/',
+		failureRedirect: '/signin',
+		failureFlash: true
+		}));
 
-router.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
+	//Configurar la route 'signout'
+	app.get('/signout', users.signout);
+	
+	app.get('/api/getuser', users.requiresLogin, users.getUser);
 
-router.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
+	app.get('/api/mobiapps', users.requiresLogin, api.mobiapps);
 
-router.post('/api/class_new_row', users.requiresLogin, api.class_new_row);
+	app.get('/api/core_config', users.requiresLogin, api.core_config);
 
-router.post('/api/class_update_row/:object_id', users.requiresLogin, api.class_update_row);
+	app.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
 
-router.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
+	app.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
 
-router.get('/api/prueba/', api.prueba);
+	app.post('/api/class_new_row', users.requiresLogin, api.class_new_row);
 
+	app.get('/api/class_update_row/:object_id', users.requiresLogin, api.class_update_row);
 
-module.exports = router;
+	app.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
+
+	app.get('/api/prueba/', api.prueba);
+	
+};
