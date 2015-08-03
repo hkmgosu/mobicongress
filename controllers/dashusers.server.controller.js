@@ -50,6 +50,7 @@ exports.renderSignin = function(req, res, next) {
     res.render('signin', {
       // Configurar la variable title de la página
       title: 'Sign-in Form',
+		prueba: process.env.NODE_ENV,
       // Configurar la variable del mensaje flash
       messages: req.flash('error') || req.flash('info')
     });

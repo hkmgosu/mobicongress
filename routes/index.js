@@ -29,12 +29,12 @@ module.exports = function(app){
 		if (!req.isAuthenticated()) {
 			res.redirect('/signin');
 		} else {
-			if(req.session.lastVisit){
+/* 			if(req.session.lastVisit){
 				console.log(req.session.lastVisit);
 			}
-			req.session.lastVisit = new Date();
+			req.session.lastVisit = new Date(); */
 			res.render('index', {
-				message: process.env.PRUEBA
+				message: req.flash('success')
 			});
 		}
 	});
