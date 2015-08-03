@@ -34,7 +34,7 @@ module.exports = function(app){
 			}
 			req.session.lastVisit = new Date();
 			res.render('index', {
-				message: req.flash('success')
+				message: process.env.PRUEBA
 			});
 		}
 	});
