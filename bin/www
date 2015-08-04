@@ -15,26 +15,18 @@ var db = mongoose();
 var app = express();
 var passport = passport();
 
-/**
- * Get port from environment and store in Express.
- */
+var https = require('https');
+var fs = require('fs');
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var options = {
+  key: fs.readFileSync('key.pem'),
+  cert: fs.readFileSync('cert.pem')
+};
 
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
-
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+var a = https.createServer(options, function (req, res) {
+  res.writeHead(200);
+  res.end("hello world\n");
+}).listen(8000);
 
 console.log('servidor ON');
 
