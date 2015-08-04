@@ -121,7 +121,6 @@ exports.mobiapps_get = function(req, res) {
 exports.core_config = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		parse.User.logOut();
 
 		var Core = parse.Object.extend("Core");
 		var query = new parse.Query(Core);
@@ -140,7 +139,6 @@ exports.core_config = function(req, res) {
 exports.class_find_rows = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		parse.User.logOut();
 
 		var Core = parse.Object.extend("Core");
 		var query = new parse.Query(Core);
@@ -216,8 +214,7 @@ exports.class_find_rows = function(req, res) {
 };
 
 exports.prueba = function(req, res) {
-
-	parse.User.logOut();
+	
 	var results;
 	var includes = ['apunta'];
 
@@ -241,7 +238,7 @@ exports.prueba = function(req, res) {
 exports.class_new_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		parse.User.logOut();
+
 		var Clobj = parse.Object.extend(req.body.classname);
 		var new_row = new Clobj();
 
