@@ -60,7 +60,7 @@ var router = express.Router();
 
 	app.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
 
-	app.get('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
+	app.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
 
 	app.post('/api/class_new_row', users.requiresLogin, api.class_new_row);
 
