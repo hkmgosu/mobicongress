@@ -10,10 +10,13 @@ var compression = require('compression');
 var session = require('express-session');
 var methodOverride = require('method-override');
 var flash = require('connect-flash');
+require('../models/dashuser.server.model.js');
 var config = require('./config');
+var routes = require('../routes/index.js');
 
 
 var app = express();
+
 
 module.exports = function() {
   // Crear una nueva instancia de la aplicación Express
@@ -47,9 +50,10 @@ module.exports = function() {
   app.use(flash());
   app.use(passport.initialize());
   app.use(passport.session());
+	
+ // Cargar los archivos de enrutamiento
+  app.use('/', routes);
 
-  // Cargar los archivos de enrutamiento
-  require('../routes/index.js')(app);
 
   // Configurar el servidor de archivos estáticos
   app.use(express.static('./public'));

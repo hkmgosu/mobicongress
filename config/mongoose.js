@@ -38,8 +38,6 @@ module.exports = function(){
 		usuario.save(); */
 		
 	});
-	
-	require('../models/dashuser.server.model.js');
 	  
 	
 	
