@@ -70,8 +70,8 @@ var router = express.Router();
 
 	app.get('/api/prueba/', api.prueba);
 	 
-	 app.post('/oni', function(req,res,next){
-		 res.send('OÑIWI!!!!');
+	 app.get('/test', function(req,res,next){
+		 res.send(process.env.NODE_ENV);
 	 });
 	
 }; 
