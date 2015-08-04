@@ -3,7 +3,11 @@
 /**
  * Module dependencies.
  */
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+ 
+if(process.env.NODE_ENV == null)
+{
+	process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+}
 
 var mongoose = require('../config/mongoose');
 var express = require('../config/app');
