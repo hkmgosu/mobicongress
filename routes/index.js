@@ -20,37 +20,37 @@ var router = express.Router();
     }
 }); */
 
-/* module.exports = function(app){ */
+ module.exports = function(app){ 
 	
 	/* 	app.route('/signup')
 	.get(users.renderSignup)
 	.post(users.signup); */
 
-/* 	app.get('/', users.requiresLogin, function(req, res, next) {
+	app.get('/', users.requiresLogin, function(req, res, next) {
 		if (!req.isAuthenticated()) {
 			res.redirect('/signin');
-		} else { */
+		} else { 
 /* 			if(req.session.lastVisit){
 				console.log(req.session.lastVisit);
 			}
 			req.session.lastVisit = new Date(); */
-/* 			res.render('index', {
+			res.render('index', {
 				message: req.flash('success')
 			});
 		}
-	}); */
+	}); 
 
 	//Configurar las routes 'signin'
-/* 	app.route('/signin')
+	app.route('/signin')
 		.get(users.renderSignin)
 		.post(passport.authenticate('local', {
 		successRedirect: '/',
 		failureRedirect: '/signin',
 		failureFlash: true
-		})); */
+		})); 
 
 	//Configurar la route 'signout'
-/* 	app.get('/signout', users.signout);
+	app.get('/signout', users.signout);
 	
 	app.get('/api/getuser', users.requiresLogin, users.getUser);
 
@@ -69,52 +69,9 @@ var router = express.Router();
 	app.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
 
 	app.get('/api/prueba/', api.prueba);
+	 
+	 app.post('/oni', function(req,res,next){
+		 res.send('OÑIWI!!!!');
+	 });
 	
-}; */
-
-router.get('/', users.requiresLogin, function(req, res, next) {
-		if (!req.isAuthenticated()) {
-			res.redirect('/signin');
-		} else {
-/* 			if(req.session.lastVisit){
-				console.log(req.session.lastVisit);
-			}
-			req.session.lastVisit = new Date(); */
-			res.render('index', {
-				message: req.flash('success')
-			});
-		}
-	});
-
-	//Configurar las routes 'signin'
-	router.route('/signin')
-		.get(users.renderSignin)
-		.post(passport.authenticate('local', {
-		successRedirect: '/',
-		failureRedirect: '/signin',
-		failureFlash: true
-		}));
-
-	//Configurar la route 'signout'
-	router.get('/signout', users.signout);
-
-router.get('/api/getuser', users.requiresLogin, users.getUser);
-
-router.get('/api/mobiapps', users.requiresLogin, api.mobiapps);
-
-router.get('/api/core_config', users.requiresLogin, api.core_config);
-
-router.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
-
-router.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
-
-router.post('/api/class_new_row', users.requiresLogin, api.class_new_row);
-
-router.post('/api/class_update_row/:object_id', users.requiresLogin, api.class_update_row);
-
-router.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
-
-router.get('/api/prueba/', api.prueba);
-
-
-module.exports = router;
+}; 

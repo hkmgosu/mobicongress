@@ -39,6 +39,6 @@ module.exports = function(){
 		
 	});
 	  
-	
+	require('../models/dashuser.server.model.js');
 	
 };
