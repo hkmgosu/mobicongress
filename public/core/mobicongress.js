@@ -145,7 +145,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 			var i = 0;
 			
 		  	 _.each(result.classes, function(value,key){
-				$http.post('/api/class_find_rows/', {
+				$http.get('/api/class_find_rows/', {
 					applicationId: result.applicationId,
 					masterKey: result.masterKey,
 					javascriptKey: result.javascriptKey,
