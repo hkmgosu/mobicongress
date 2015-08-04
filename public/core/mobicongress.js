@@ -92,6 +92,8 @@ app.controller("MainController", ["$scope", "$rootScope", "$location", "$http",
 			type: 'success!',
 			message: 'Bienvenido'
 		};
+		
+		
 
 	}
 ]);
@@ -115,14 +117,14 @@ app.controller("HomeController", ["$scope", "$rootScope", "$location", "$http",
 		if ($location.url() == "/") {
 			$rootScope.mini_menu = false;
 		}
-
-
+		
+		console.log($location.absUrl());
 
 	}
 ]);
 
-app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routeParams",
-	function($scope, $rootScope, $http, $routeParams) {
+app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routeParams", "$location",
+	function($scope, $rootScope, $http, $routeParams, $location) {
 
 		$rootScope.title = "Mobicongress | MobiApps";
 		$rootScope.page_title = "Classes";
@@ -131,6 +133,8 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 		$scope.schema_data = [];
 		$scope.hide_contain = true;
 		$scope.loading = 0;
+		
+		console.log($location.protocol() + '://' +  $location.host());
 		
 		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).then(function(result) {
 		  //console.log(result);
@@ -172,7 +176,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			return angular.isString(item);
 		} */
 
-		$http.post('/api/class_find_rows', {
+		$http.post($location.protocol() + $location.host() + '/api/class_find_rows', {
 			classname: $routeParams.classname
 		}).
 		success(function(data, status, headers, config) {
@@ -198,7 +202,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$scope.selectChoices = [];
 		$scope.loadSelect = function(name, include) {
 
-			$http.post('/api/class_find_rows', {
+			$http.post($location.protocol() + $location.host() + '/api/class_find_rows', {
 				classname: name,
 				includes: include
 			}).
@@ -227,12 +231,12 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 
 
-		}
+		};
 
 		$scope.class_new_row = [];
 		$scope.create_class_row = function(name) {
 
-			$http.post('/api/class_new_row', {
+			$http.post($location.protocol() + $location.host() + '/api/class_new_row', {
 				classname: name,
 				info: $scope.class_new_row[name]
 			}).
@@ -249,7 +253,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 				//$scope.class_new_row = [];
 
-				$http.post('/api/class_find_rows', {
+				$http.post($location.protocol() + $location.host() + '/api/class_find_rows', {
 					classname: $routeParams.classname
 				}).
 				success(function(data, status, headers, config) {
