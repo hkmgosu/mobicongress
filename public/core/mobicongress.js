@@ -134,7 +134,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 		$scope.hide_contain = true;
 		$scope.loading = 0;
 		
-		console.log($location.protocol() + '://' +  $location.host());
+		console.log('https://' +  $location.host());
 		
 		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).then(function(result) {
 		  //console.log(result);
@@ -145,7 +145,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 			var i = 0;
 			
 		  	 _.each(result.classes, function(value,key){
-				$http.post('/api/class_find_rows/', {
+				$http.post('https://' +  $location.host() + '/api/class_find_rows/', {
 					applicationId: result.applicationId,
 					masterKey: result.masterKey,
 					javascriptKey: result.javascriptKey,
