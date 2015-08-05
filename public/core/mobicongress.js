@@ -145,7 +145,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 			var i = 0;
 			
 		  	 _.each(result.classes, function(value,key){
-				$http.post('https://' +  $location.host() + '/api/class_find_rows/', {
+				$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows/', {
 					applicationId: result.applicationId,
 					masterKey: result.masterKey,
 					javascriptKey: result.javascriptKey,
@@ -176,7 +176,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			return angular.isString(item);
 		} */
 
-		$http.post($location.protocol() + $location.host() + '/api/class_find_rows', {
+		$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
 			classname: $routeParams.classname
 		}).
 		success(function(data, status, headers, config) {
@@ -202,7 +202,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$scope.selectChoices = [];
 		$scope.loadSelect = function(name, include) {
 
-			$http.post($location.protocol() + $location.host() + '/api/class_find_rows', {
+			$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
 				classname: name,
 				includes: include
 			}).
@@ -236,7 +236,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$scope.class_new_row = [];
 		$scope.create_class_row = function(name) {
 
-			$http.post($location.protocol() + $location.host() + '/api/class_new_row', {
+			$http.post($location.protocol() + '://' +  $location.host() + '/api/class_new_row', {
 				classname: name,
 				info: $scope.class_new_row[name]
 			}).
@@ -253,7 +253,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 				//$scope.class_new_row = [];
 
-				$http.post($location.protocol() + $location.host() + '/api/class_find_rows', {
+				$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
 					classname: $routeParams.classname
 				}).
 				success(function(data, status, headers, config) {
@@ -278,7 +278,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 
 		$scope.delete_class_row = function(id, name) {
-			$http.post('/api/class_delete_row', {
+			$http.post($location.protocol() + '://' +  $location.host() + '/api/class_delete_row', {
 				classname: name,
 				object_id: id
 			}).
@@ -292,7 +292,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 					message: data
 				};
 
-				$http.post('/api/class_find_rows', {
+				$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
 					classname: $routeParams.classname
 				}).
 				success(function(data, status, headers, config) {
