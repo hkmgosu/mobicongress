@@ -1,4 +1,4 @@
 module.exports = {
-	MONGOLAB_URI: "mongodb://admin:mobicongress0199@ds059692.mongolab.com:59692/mobicongress",
+	MONGOLAB_URI: process.env.MONGOLAB_URI,
 	sessionSecret: 'developmentSessionSecret'
 };
