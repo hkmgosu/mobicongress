@@ -21,7 +21,7 @@ exports.mobiapps = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": procces.env.PARSE_ACCOUNT_USER,
+				"X-Parse-Email": process.env.PARSE_ACCOUNT_USER,
 				"X-Parse-Password": process.env.PARSE_ACCOUNT_PASSWORD,
 				"Content-Type": "application/json"
 
@@ -57,7 +57,7 @@ exports.mobiapps_get = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": procces.env.PARSE_ACCOUNT_USER,
+				"X-Parse-Email": process.env.PARSE_ACCOUNT_USER,
 				"X-Parse-Password": process.env.PARSE_ACCOUNT_PASSWORD,
 				"Content-Type": "application/json"
 
