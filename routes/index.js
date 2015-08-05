@@ -71,7 +71,7 @@ var router = express.Router();
 	app.get('/api/prueba/', api.prueba);
 	 
 	 app.get('/test', function(req,res,next){
-		 res.send(process.env.IN_HEROKU);
+		 res.send(process.env.NODE_ENV);
 	 });
 	
 }; 
