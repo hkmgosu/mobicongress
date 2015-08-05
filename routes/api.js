@@ -21,8 +21,8 @@ exports.mobiapps = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": "evolutionaimagos@gmail.com",
-				"X-Parse-Password": "mobicongress0199",
+				"X-Parse-Email": procces.env.PARSE_ACCOUNT_USER,
+				"X-Parse-Password": process.env.PARSE_ACCOUNT_PASSWORD,
 				"Content-Type": "application/json"
 
 			} // request headers 
@@ -57,8 +57,8 @@ exports.mobiapps_get = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": "evolutionaimagos@gmail.com",
-				"X-Parse-Password": "mobicongress0199",
+				"X-Parse-Email": procces.env.PARSE_ACCOUNT_USER,
+				"X-Parse-Password": process.env.PARSE_ACCOUNT_PASSWORD,
 				"Content-Type": "application/json"
 
 			} // request headers 
