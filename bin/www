@@ -6,7 +6,10 @@
  
 if(process.env.NODE_ENV == null)
 {
-	process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+	process.env.NODE_ENV = 'development';
+}else
+{
+	process.env.NODE_ENV = 'production';
 }
 
 var mongoose = require('../config/mongoose');
