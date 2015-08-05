@@ -5,21 +5,6 @@ var passport = require('passport');
 var api = require('./api');
 var router = express.Router();
 
-/* GET home page. */
-/* app.get('/', users.requiresLogin, function(req, res, next) {
-    if (!req.isAuthenticated()) {
-        res.redirect('/signin');
-    } else {
-		if(req.session.lastVisit){
-			console.log(req.session.lastVisit);
-		}
-		req.session.lastVisit = new Date();
-        res.render('index', {
-            message: req.flash('success')
-        });
-    }
-}); */
-
  module.exports = function(app){ 
 	
 	/* 	app.route('/signup')
@@ -29,8 +14,8 @@ var router = express.Router();
 	app.get('/', users.requiresLogin, function(req, res, next) {
 		if (!req.isAuthenticated()) {
 			res.redirect('/signin');
-		} else { 
-/* 			if(req.session.lastVisit){
+		} else {
+			/* 			if(req.session.lastVisit){
 				console.log(req.session.lastVisit);
 			}
 			req.session.lastVisit = new Date(); */
@@ -38,20 +23,19 @@ var router = express.Router();
 				message: req.flash('success')
 			});
 		}
-	}); 
+	});
 
-	//Configurar las routes 'signin'
+
 	app.route('/signin')
 		.get(users.renderSignin)
 		.post(passport.authenticate('local', {
-		successRedirect: '/',
-		failureRedirect: '/signin',
-		failureFlash: true
-		})); 
+			successRedirect: '/',
+			failureRedirect: '/signin',
+			failureFlash: true
+		}));
 
-	//Configurar la route 'signout'
 	app.get('/signout', users.signout);
-	
+
 	app.get('/api/getuser', users.requiresLogin, users.getUser);
 
 	app.get('/api/mobiapps', users.requiresLogin, api.mobiapps);
@@ -69,9 +53,9 @@ var router = express.Router();
 	app.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
 
 	app.get('/api/prueba/', api.prueba);
-	 
-	 app.get('/test', function(req,res,next){
-		 res.send(process.env.MONGOLAB_URI);
-	 });
+
+/* 	app.get('/test', function(req, res, next) {
+		res.send(process.env.MONGOLAB_URI);
+	}); */
 	
 }; 
