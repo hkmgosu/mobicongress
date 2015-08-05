@@ -4,7 +4,12 @@
  * Module dependencies.
  */
  
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+if(process.env.IN_HEROKU != null)
+{
+	process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+}else{
+	process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+}
 
 
 var mongoose = require('../config/mongoose');
