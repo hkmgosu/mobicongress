@@ -399,7 +399,10 @@ app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$ht
 			console.log($scope.class_new_row[name]);
 			console.log(name);
 			var fd = new FormData();
-			_.each($scope.files, function(value,key){ fd.append(key, value); });
+			_.each($scope.files, function(value,key){ 
+				fd.append(key, value); 
+				console.log(key);
+			});
 			fd.append('classname', name);
 			fd.append('info', angular.toJson($scope.class_new_row[name]));
 			
@@ -431,7 +434,10 @@ app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$ht
 		$scope.uploadFile = function(column, files) {
 			//fd.append(column, files[0]);
 			//console.log(files[0]);
-			$scope.files.push({ name: column, file: files[0] });
+			$scope.files[column] = files[0];
+			_.each($scope.files, function(value,key){
+				console.log(key); console.log(value);
+			});
 		};
 		
 
