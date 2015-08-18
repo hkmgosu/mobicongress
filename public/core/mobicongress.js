@@ -1,5 +1,5 @@
 
-var app = angular.module('mobicongress', ['ngSanitize', 'ui.select', 'ngRoute']);
+var app = angular.module('mobicongress', ['ngSanitize', 'ui.select', 'ngRoute', 'toaster', 'ngAnimate', 'ngFileUpload']);
 
 app.config(function($routeProvider, uiSelectConfig) {
 
@@ -25,9 +25,9 @@ app.config(function($routeProvider, uiSelectConfig) {
 		controller: 'ClassController'
 	})
 
-	.when('/class/edit/:object_id', {
-		templateUrl: 'views/events/events_edit.html',
-		controller: 'EventEditController'
+	.when('/class/edit/:classname/:object_id', {
+		templateUrl: 'views/class/class_form_edit.html',
+		controller: 'ClassEditController'
 	})
 
 	.otherwise({
@@ -76,6 +76,22 @@ app.filter('propsFilter', function() {
 
 		return out;
 	}
+});
+
+app.directive('fileUpload', function () {
+    return {
+        scope: true,        //create a new scope
+        link: function (scope, el, attrs) {
+            el.bind('change', function (event) {
+                var files = event.target.files;
+                //iterate files since 'multiple' may be specified on the element
+                for (var i = 0;i<files.length;i++) {
+                    //emit event upward
+                    scope.$emit("fileSelected", { file: files[i] });
+                }                                       
+            });
+        }
+    };
 });
 
 
@@ -134,7 +150,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 		$scope.hide_contain = true;
 		$scope.loading = 0;
 		
-		console.log('https://' +  $location.host());
+		console.log($location.protocol());
 		
 		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).then(function(result) {
 		  //console.log(result);
@@ -145,7 +161,7 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 			var i = 0;
 			
 		  	 _.each(result.classes, function(value,key){
-				$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows/', {
+				$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows/', {
 					applicationId: result.applicationId,
 					masterKey: result.masterKey,
 					javascriptKey: result.javascriptKey,
@@ -163,8 +179,8 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 	}
 ]);
 
-app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_',
-	function($scope, $rootScope, $location, $http, $routeParams, $filter, _) {
+app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_', 'toaster', 'Upload',
+	function($scope, $rootScope, $location, $http, $routeParams, $filter, _, toaster, Upload) {
 
 		$rootScope.title = "Mobicongress | " + $routeParams.classname;
 		$rootScope.page_title = "Class: " + $routeParams.classname;
@@ -172,37 +188,18 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$rootScope.active = $routeParams.classname;
 		$scope.classname = $routeParams.classname;
 
-/* 		$scope.isString = function(item) {
-			return angular.isString(item);
-		} */
-
-		$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
+		$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 			classname: $routeParams.classname
 		}).
 		success(function(data, status, headers, config) {
 			$scope.class_rows = data;
 			$scope.class_config = data.config;
-			
-			//console.log(data.config.prueba);
 		});
-
-		$scope.class_order = {};
-
-		$scope.class_orders = [{
-			name: 'title.es',
-			column: 'Title'
-		}, {
-			name: 'start.iso',
-			column: 'Start'
-		}, {
-			name: 'end.iso',
-			column: 'End'
-		}];
 
 		$scope.selectChoices = [];
 		$scope.loadSelect = function(name, include) {
 
-			$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
+			$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 				classname: name,
 				includes: include
 			}).
@@ -228,32 +225,32 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			error(function(data, status, headers, config) {
 				console.log(data);
 			});
-
-
-
 		};
 
 		$scope.class_new_row = [];
 		$scope.create_class_row = function(name) {
-
-			$http.post($location.protocol() + '://' +  $location.host() + '/api/class_new_row', {
-				classname: name,
-				info: $scope.class_new_row[name]
+			$scope.guardarDisabled = true;
+			var fd = new FormData();
+			_.each($scope.files, function(value,key){ 
+				fd.append(key, value); 
+				console.log(key);
+			});
+			fd.append('classname', name);
+			fd.append('info', angular.toJson($scope.class_new_row[name]));
+			
+			$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_new_row', fd, {
+				withCredentials: true,
+				headers: {'Content-Type': undefined },
+				transformRequest: angular.identity
 			}).
 			success(function(data, status, headers, config) {
+				console.log(data || "Request failed");
+				console.log(status);
+				$scope.guardarDisabled = false;
+				toaster.pop(data.type, data.title, data.detail);
+				
 
-				console.log(data);
-
-				$rootScope.flash = {
-					status: true,
-					class: 'success',
-					type: 'SUCCESS!',
-					message: data
-				};
-
-				//$scope.class_new_row = [];
-
-				$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
+				$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 					classname: $routeParams.classname
 				}).
 				success(function(data, status, headers, config) {
@@ -265,110 +262,178 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			error(function(data, status, headers, config) {
 				console.log(data || "Request failed");
 				console.log(status);
-				$rootScope.flash = {
-					status: true,
-					class: 'danger',
-					type: 'ERROR!',
-					message: data
-				};
+				toaster.pop(data.type, data.title, data.detail);
 			});
 
-
+		};
+		
+		$scope.files = {};
+		$scope.uploadFile = function(column, files) {
+			//fd.append(column, files[0]);
+			//console.log(files[0]);
+			$scope.files[column] = files[0];
+			_.each($scope.files, function(value,key){
+				console.log(key); console.log(value);
+			});
+			
 		};
 
 
 		$scope.delete_class_row = function(id, name) {
-			$http.post($location.protocol() + '://' +  $location.host() + '/api/class_delete_row', {
+			$scope.borrarDisabled = true;
+			$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_delete_row', {
 				classname: name,
 				object_id: id
 			}).
 			success(function(data, status, headers, config) {
-				console.log(data);
-
-				$rootScope.flash = {
-					status: true,
-					class: 'success',
-					type: 'SUCCESS!',
-					message: data
-				};
-
-				$http.post($location.protocol() + '://' +  $location.host() + '/api/class_find_rows', {
+				
+				$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 					classname: $routeParams.classname
 				}).
 				success(function(data, status, headers, config) {
 					$scope.class_rows = data;
 					$scope.class_config = data.config;
 				});
-
+				
+				console.log(data);
+				console.log(status);
+				toaster.pop(data.type, data.title, data.detail);
+				$scope.borrarDisabled = false;
 			}).
 			error(function(data, status, headers, config) {
 				console.log(data || "Request failed");
 				console.log(status);
-				$rootScope.flash = {
-					status: true,
-					class: 'danger',
-					type: 'ERROR!',
-					message: data
-				};
+				toaster.pop(data.type, data.title, data.detail);
 			});
 		};
-
-
-
+		
+		
 	}
 ]);
 
 
-app.controller("EventEditController", ["$scope", "$rootScope", "$http", "$routeParams",
-	function($scope, $rootScope, $http, $routeParams) {
-
-		$http.get('/api/events_get/' + $routeParams.event_id).
-		success(function(data, status, headers, config) {
-			$scope.events_edit = data;
-			console.log(data);
-			console.log(status);
-			//window.location.href = '#/events';
+app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_', 'toaster', 'Upload',
+	function($scope, $rootScope, $location, $http, $routeParams, $filter, _, toaster, Upload) {
+	
+		$rootScope.title = "Mobicongress | " + $routeParams.classname;
+		$rootScope.page_title = "Class: " + $routeParams.classname;
+		$rootScope.page_desc = $routeParams.classname + " de la Aplicación";
+		$rootScope.active = $routeParams.classname;
+		$scope.classname = $routeParams.classname;
+		
+		$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+			classname: $routeParams.classname,
+			object_id: $routeParams.object_id
 		}).
-		error(function(data, status, headers, config) {
-			console.log(data || "Request failed");
-			console.log(status);
-			$rootScope.flash = {
-				status: true,
-				class: 'danger',
-				type: 'ERROR!',
-				message: data
-			};
+		success(function(data, status, headers, config) {
+
+			$scope.class_config = data.config;
+			$scope.class_edit_row = {};
+			console.log(data);
+			
+			$scope.class_edit_row.objectId = data.classdata[0].objectId;
+			_.each(data.config.update, function(value,key){
+				if(data.classdata[0][value.name] !== undefined){
+					if(value.type == 'String' && value.inputType == 'text' || value.inputType == 'textarea'){
+						$scope.class_edit_row[value.name] = data.classdata[0][value.name];
+					}else if(value.type == 'Date' && value.inputType == 'datetime-local'){
+						$scope.class_edit_row[value.name] = new Date(data.classdata[0][value.name].iso);
+					}else if(value.type == 'Pointer' && value.inputType == 'select'){
+						$scope.class_edit_row[value.name] = data.classdata[0][value.name].objectId;
+					}else if(value.type == 'Array' && value.inputType == 'select'){
+							var paso = [];
+							for(var i = 0; i < data.classdata[0][value.name].length; i++){
+								paso.push(data.classdata[0][value.name][i].objectId);
+							}
+							$scope.class_edit_row[value.name] = paso; 
+					}else{
+						$scope.class_edit_row[value.name] = data.classdata[0][value.name];
+					}
+				}else
+					{
+/* 						console.log(value.name);
+						console.log(value); */
+					}
+			});
+			
+			console.log($scope.class_edit_row);
+			
 		});
+		
+		
+		$scope.selectChoices = [];
+		$scope.loadSelect = function(name, include) {
 
-
-
-
-		$scope.update_event = function() {
-
-			$http.post('/api/events_update/' + $routeParams.event_id, $scope.events_edit).
+			$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+				classname: name,
+				includes: include
+			}).
 			success(function(data, status, headers, config) {
+
+				$scope.selectChoices[name] = [];
+				for (var i = 0; i < data.classdata.length; i++) {
+					if (include.length > 0) {
+						for (var j = 0; j < include.length; j++) {
+							if (include[j] == data.classdata[i].includes[j].classname) {
+								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
+								delete data.classdata[i].includes;
+								$scope.selectChoices[name].push(data.classdata[i].classdata);
+							}
+						}
+					} else {
+						$scope.selectChoices[name].push(data.classdata[i].classdata);
+					}
+				}
+
+
+			}).
+			error(function(data, status, headers, config) {
 				console.log(data);
+			});
+		};
+
+		$scope.class_new_row = [];
+		$scope.save_class_row = function(name) {
+			
+			$scope.guardarDisabled = true;
+			console.log($scope.class_new_row[name]);
+			console.log(name);
+			var fd = new FormData();
+			_.each($scope.files, function(value,key){ fd.append(key, value); });
+			fd.append('classname', name);
+			fd.append('info', angular.toJson($scope.class_new_row[name]));
+			
+			$http.post($location.protocol() + '://' +  $location.host() + ':' + $location.port() + '/api/class_update_row', fd, {
+				withCredentials: true,
+				headers: {'Content-Type': undefined },
+				transformRequest: angular.identity
+			}).
+			success(function(data, status, headers, config) {
+				console.log(data || "Request failed");
 				console.log(status);
-				$rootScope.flash = {
-					status: true,
-					class: 'success',
-					type: 'SUCCESS!',
-					message: data
-				};
-				window.location.href = '#/events';
+				$scope.guardarDisabled = false;
+				$location.path("/class/" + $scope.classname);
+				toaster.pop(data.type, data.title, data.detail);
+				
+
+				
+
 			}).
 			error(function(data, status, headers, config) {
 				console.log(data || "Request failed");
 				console.log(status);
-				$rootScope.flash = {
-					status: true,
-					class: 'danger',
-					type: 'ERROR!',
-					message: data
-				};
+				toaster.pop(data.type, data.title, data.detail);
 			});
 
 		};
+		
+		$scope.files = [];
+		$scope.uploadFile = function(column, files) {
+			//fd.append(column, files[0]);
+			//console.log(files[0]);
+			$scope.files.push({ name: column, file: files[0] });
+		};
+		
 
 	}
 ]);

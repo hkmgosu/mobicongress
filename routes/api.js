@@ -4,8 +4,14 @@ var passport = require('passport');
 var _ = require('underscore');
 var moment = require('moment-timezone');
 var Client = require('node-rest-client').Client;
+var fs = require('fs');
 
 client = new Client();
+
+/* var parse_user = process.env.PARSE_ACCOUNT_USER;
+var parse_password = process.env.PARSE_ACCOUNT_PASSWORD; */
+var parse_user = 'evolutionaimagos@gmail.com';
+var parse_password = 'mobicongress0199';
 
 //parse.initialize(config.parse.appId,config.parse.jsKey,config.parse.masterKey);
 // GET
@@ -21,8 +27,8 @@ exports.mobiapps = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": process.env.PARSE_ACCOUNT_USER,
-				"X-Parse-Password": process.env.PARSE_ACCOUNT_PASSWORD,
+				"X-Parse-Email": parse_user,
+				"X-Parse-Password": parse_password,
 				"Content-Type": "application/json"
 
 			} // request headers 
@@ -57,8 +63,8 @@ exports.mobiapps_get = function(req, res) {
 			//path:{"id":120}, // path substitution var 
 			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
 			headers: {
-				"X-Parse-Email": process.env.PARSE_ACCOUNT_USER,
-				"X-Parse-Password": process.env.PARSE_ACCOUNT_PASSWORD,
+				"X-Parse-Email": parse_user,
+				"X-Parse-Password": parse_password,
 				"Content-Type": "application/json"
 
 			} // request headers 
@@ -148,6 +154,10 @@ exports.class_find_rows = function(req, res) {
 			var web_config = results[0];
 			var clobj = parse.Object.extend(req.body.classname);
 			var query = new parse.Query(clobj);
+			
+			if(_.has(req.body, "object_id")){
+				query.equalTo("objectId", req.body.object_id);
+			}
 
 
 			if (_.has(req.body, "includes")) {
@@ -238,12 +248,11 @@ exports.prueba = function(req, res) {
 exports.class_new_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
-
+		
 		var Clobj = parse.Object.extend(req.body.classname);
 		var new_row = new Clobj();
 
-		_.each(req.body.info, function(value, key) {
-			//new_row.set(key, value);
+		_.each(JSON.parse(req.body.info), function(value, key) {
 			if (_.has(value, "value")) {
 				if (value.type == 'String' && value.value !== null) {
 					new_row.set(key, value.value);
@@ -262,7 +271,7 @@ exports.class_new_row = function(req, res) {
 							tempArray.push({
 								"__type": value.type,
 								"className": value.targetClass,
-								"objectId": value.value[0]
+								"objectId": value.value[i]
 							});
 						}
 						new_row.set(key, tempArray);
@@ -270,14 +279,24 @@ exports.class_new_row = function(req, res) {
 				}
 			}
 		});
-
-		new_row.save().then(function(data) {
-			res.json(data);
-		}, function(error) {
-			res.json("Error: " + error.code + " " + error.message);
+		
+		_.each(req.files, function(value, key){
+			console.log(req.files);
+			console.log(value.path);
+			if(value.path !== undefined){
+				var fileData = fs.readFileSync(value.path);
+				fileData = Array.prototype.slice.call(new Buffer(fileData), 0);
+				var parseFile = new parse.File(value.name, fileData);
+				new_row.set(key, parseFile);
+			}
+			
 		});
 
-		//res.json(req.body);
+		new_row.save().then(function(data) {
+			res.json({type: 'success', title: 'SUCCESS!', detail: req.body.classname + ' guardado exitosamente'});
+		}, function(error) {
+			res.json({type: 'error', title: 'ERROR! no se ha guardado el objeto ' + req.body.classname, detail: "Error: " + error.code + " " + error.message});
+		});
 
 
 	} else {
@@ -291,27 +310,70 @@ exports.class_new_row = function(req, res) {
 exports.class_update_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		var Event = parse.Object.extend("Event");
-		var query = new parse.Query(Event);
+		console.log(JSON.parse(req.body.info).objectId.value);
+		var Clobj = parse.Object.extend(req.body.classname);
+		var query = new parse.Query(Clobj);
 
-		query.get(req.params.event_id, {
-			success: function(eventup) {
-				eventup.save(null, {
-					success: function(data) {
+		query.get(JSON.parse(req.body.info).objectId.value, {
+			success: function(classup) {
+				classup.save(null, {
+					success: function(new_row) {
 
-						data.set("title", req.body.title);
-						data.set("detail", req.body.detail);
-						data.set("start", new Date(req.body.start));
-						data.set("end", new Date(req.body.end));
-						data.save()
+						_.each(JSON.parse(req.body.info), function(value, key) {
+							if (_.has(value, "value")) {
+								if (value.type == 'String' && value.value !== null) {
+									new_row.set(key, value.value);
+								} else if (value.type == 'Date' && value.value !== null) {
+									new_row.set(key, new Date(value.value));
+								} else if (value.type == 'Pointer' && value.value !== null) {
+									new_row.set(key, {
+										"__type": value.type,
+										"className": value.targetClass,
+										"objectId": value.value
+									});
+								} else if (value.type == 'Array' && value.value !== null) {
+									if (value.value.length > 0) {
+										var tempArray = [];
+										for (var i = 0; i < value.value.length; i++) {
+											tempArray.push({
+												"__type": value.type,
+												"className": value.targetClass,
+												"objectId": value.value[i]
+											});
+										}
+										new_row.set(key, tempArray);
+									}
+								}
+							}
+						});
+
+						_.each(req.files, function(value, key){
+							console.log(value.path);
+							var fileData = fs.readFileSync(value.path);
+							fileData = Array.prototype.slice.call(new Buffer(fileData), 0);
+							var parseFile = new parse.File(value.name, fileData);
+							new_row.set(key, parseFile);
+
+						});
+
+						new_row.save().then(function(data) {
+							res.json({type: 'success', title: 'SUCCESS!', detail: req.body.classname + ' guardado exitosamente'});
+						}, function(error) {
+							res.json({type: 'error', title: 'ERROR! no se ha guardado el objeto ' + req.body.classname, detail: "Error: " + error.code + " " + error.message});
+						});
+						
+						
+						
+						
+						
+						
+						
 					}
 				});
 
 			},
 			error: function(data, error) {
-				// Execute any logic that should take place if the save fails.
-				// error is a Parse.Error with an error code and message.
-				res.json('Failed to get object, with error code: ' + error.message + ' objectId: ' + req.params.event_id);
+				res.json({type: 'error', title: 'ERROR! no se ha guardado el objeto ' + req.body.classname, detail: "Error: " + error.code + " " + error.message});
 			}
 		});
 
@@ -332,12 +394,10 @@ exports.class_delete_row = function(req, res) {
 			success: function(data) {
 				// Execute any logic that should take place after the object is saved.
 				data.destroy({});
-				res.json('Deleted objectId: ' + req.body.object_id);
+				res.json({type: 'success', title: 'Success!',detail: 'Deleted ' + req.body.classname });
 			},
 			error: function(data, error) {
-				// Execute any logic that should take place if the save fails.
-				// error is a Parse.Error with an error code and message.
-				res.json('Failed to get object, with error code: ' + error.message);
+				res.json({type: 'error', title: 'ERROR! no se borrado el objeto ' + req.body.classname, detail: "Error: " + error.code + " " + error.message});
 			}
 		});
 

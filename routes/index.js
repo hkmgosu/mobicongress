@@ -4,6 +4,8 @@ var flash = require('connect-flash');
 var passport = require('passport');
 var api = require('./api');
 var router = express.Router();
+var multipart = require('connect-multiparty');
+var multipartMiddleware = multipart();
 
  module.exports = function(app){ 
 	
@@ -46,16 +48,17 @@ var router = express.Router();
 
 	app.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
 
-	app.post('/api/class_new_row', users.requiresLogin, api.class_new_row);
+	app.post('/api/class_new_row', users.requiresLogin, multipartMiddleware, api.class_new_row);
 
-	app.get('/api/class_update_row/:object_id', users.requiresLogin, api.class_update_row);
+	app.post('/api/class_update_row/', users.requiresLogin, multipartMiddleware, api.class_update_row);
 
 	app.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
 
 	app.get('/api/prueba/', api.prueba);
 
-/* 	app.get('/test', function(req, res, next) {
-		res.send(process.env.MONGOLAB_URI);
-	}); */
+ 	app.post('/test', multipartMiddleware, function(req, res, next) {
+		console.log(req.files);
+		res.json(JSON.parse(req.body.info));
+	}); 
 	
 }; 

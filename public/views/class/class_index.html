@@ -10,13 +10,6 @@
 <!-- END PAGE BREADCRUMB -->
 <!-- BEGIN PAGE CONTENT INNER -->
 <div class="row">
-	<div class="col-md-12" ng-show="flash.status">
-		<div class="alert alert-{{flash.class}} alert-dismissible" role="alert">
-			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
-			</button>
-			<strong>{{flash.type}}</strong> {{flash.message}}
-		</div>
-	</div>
 	<div class="col-md-12">
 		<div class="portlet light">
 			<div class="portlet-title">
@@ -135,8 +128,8 @@
 										</span>
 									</li>
 								</ul>
-								<a class="btn btn-default" href="#/class/edit/{{classname}}/{{row.objectId}}">Edit</a>
-								<input value="Delete" class="btn btn-default" type="button" ng-click="delete_class_row(row.objectId, classname)">
+								<a class="btn btn-default" href="#/class/edit/{{classname}}/{{row.objectId}}" ng-disabled="editarDisabled">Edit</a>
+								<input value="Delete" class="btn btn-default" type="button" ng-disabled="borrarDisabled" ng-click="delete_class_row(row.objectId, classname)">
 							</div>
 						</div>
 					</div>
