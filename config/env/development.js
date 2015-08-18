@@ -1,5 +1,4 @@
-/* var mongolaburi = process.env.MONGOLAB_URI; */
-var mongolaburi = 'mongodb://admin:mobicongress0199@ds059692.mongolab.com:59692/mobicongress';
+var mongolaburi = process.env.MONGOLAB_URI;
 
 module.exports = {
 	MONGOLAB_URI: mongolaburi,
