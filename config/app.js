@@ -22,7 +22,7 @@ module.exports = function() {
 	if (process.env.NODE_ENV === 'development') {
 		app.use(morgan('dev'));
 	} else if (process.env.NODE_ENV === 'production') {
-		app.use(compress());
+		app.use(compression());
 	}
 
 	// Usar las funciones middleware 'body-parser' y 'method-override'
