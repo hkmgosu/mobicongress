@@ -2,14 +2,70 @@
 		<h3 class="modal-title">Nuevo!</h3>
 	</div>
 <div class="modal-body">
-		<ul>
-			<li ng-repeat="item in items">
-				<a href="#" ng-click="$event.preventDefault(); selected.item = item">{{ item }}</a>
-			</li>
-		</ul>
-		Selected: <b>{{ selected.item }}</b>
-	</div>
+	<form class="form-horizontal">
+		<fieldset>
+
+		<!-- Form Name -->
+		<legend>Form Name</legend>
+
+		<!-- Text input-->
+		<div class="control-group">
+		  <label class="control-label" for="textinput">Text Input</label>
+		  <div class="controls">
+			<input id="textinput" name="textinput" type="text" placeholder="placeholder" class="input-xlarge">
+			<p class="help-block">help</p>
+		  </div>
+		</div>
+
+		<!-- Textarea -->
+		<div class="control-group">
+		  <label class="control-label" for="textarea">Text Area</label>
+		  <div class="controls">                     
+			<textarea id="textarea" name="textarea">default text</textarea>
+		  </div>
+		</div>
+
+		<!-- Multiple Radios -->
+		<div class="control-group">
+		  <label class="control-label" for="radios">Multiple Radios</label>
+		  <div class="controls">
+			<label class="radio" for="radios-0">
+			  <input type="radio" name="radios" id="radios-0" value="Option one" checked="checked">
+			  Option one
+			</label>
+			<label class="radio" for="radios-1">
+			  <input type="radio" name="radios" id="radios-1" value="Option two">
+			  Option two
+			</label>
+		  </div>
+		</div>
+
+		<!-- Select Basic -->
+		<div class="control-group">
+		  <label class="control-label" for="selectbasic">Select Basic</label>
+		  <div class="controls">
+			<select id="selectbasic" name="selectbasic" class="input-xlarge">
+			  <option>Option one</option>
+			  <option>Option two</option>
+			</select>
+		  </div>
+		</div>
+
+		<!-- Select Multiple -->
+		<div class="control-group">
+		  <label class="control-label" for="selectmultiple">Select Multiple</label>
+		  <div class="controls">
+			<select id="selectmultiple" name="selectmultiple" class="input-xlarge" multiple="multiple">
+			  <option>Option one</option>
+			  <option>Option two</option>
+			</select>
+		  </div>
+		</div>
+
+		</fieldset>
+	</form>
+</div>
 <div class="modal-footer">
-		<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-		<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-	</div>
+	<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+	<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
