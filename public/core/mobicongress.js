@@ -367,9 +367,53 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 	}
 ]);
 
-app.controller('ModalInstanceCtrl', function ($scope, $modalInstance, items) {
+app.controller('ModalInstanceCtrl', function ($scope, $modalInstance, items, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
 
-  $scope.items = items;
+  $scope.classname = $routeParams.classname;
+
+		$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+			classname: $routeParams.classname
+		}).
+		success(function(data, status, headers, config) {
+			$scope.class_rows = data;
+			$scope.class_config = data.config;
+		});
+
+		$scope.selectChoices = [];
+		$scope.loadSelect = function(name, include) {
+
+			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+				classname: name,
+				includes: include
+			}).
+			success(function(data, status, headers, config) {
+
+				$scope.selectChoices[name] = [];
+				for (var i = 0; i < data.classdata.length; i++) {
+					if (include.length > 0) {
+						for (var j = 0; j < include.length; j++) {
+							if (include[j] == data.classdata[i].includes[j].classname) {
+								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
+								delete data.classdata[i].includes;
+								$scope.selectChoices[name].push(data.classdata[i].classdata);
+							}
+						}
+					} else {
+						$scope.selectChoices[name].push(data.classdata[i].classdata);
+					}
+				}
+
+
+			}).
+			error(function(data, status, headers, config) {
+				console.log(data);
+			});
+		};
+
+	
+	
+	
+	$scope.items = items;
   $scope.selected = {
     item: $scope.items[0]
   };
