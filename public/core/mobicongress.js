@@ -319,11 +319,11 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 		$scope.items = ['item1', 'item2', 'item3'];
 
-		$scope.open = function(size) {
+		$scope.openView = function(size) {
 
 			var modalInstance = $modal.open({
 				animation: true,
-				templateUrl: 'myModalContent.html',
+				templateUrl: 'modalNew',
 				controller: 'ModalInstanceCtrl',
 				size: size,
 				resolve: {
@@ -340,6 +340,27 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			});
 		};
 
+		
+		$scope.openEdit = function(size) {
+
+			var modalInstance = $modal.open({
+				animation: true,
+				templateUrl: 'modalEdit',
+				controller: 'ModalInstanceCtrl',
+				size: size,
+				resolve: {
+					items: function() {
+						return $scope.items;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(selectedItem) {
+				$scope.selected = selectedItem;
+			}, function() {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+		};
 
 
 
