@@ -1,3 +1,6 @@
+<script type="text/ng-template" id="myModalContent.html">
+	<div ng-include="'views/class/class_modal_new.html'"></div>
+</script>
 <!-- BEGIN PAGE BREADCRUMB -->
 <ul class="page-breadcrumb breadcrumb">
 	<li>
@@ -107,29 +110,31 @@
 							<div class="panel-body">
 								<ul class="list-group">
 									<h4>Details</h4>
-									<li class="list-group-item" ng-repeat="(key , value) in row" ng-if="key != 'createdAt' && key != 'objectId' && key != 'updatedAt'"><strong>{{key}}: </strong> 
-										<span ng-repeat="classConfig in class_config.find.details">	
-											<span ng-if="classConfig.type == 'String' && classConfig.name == key">{{value}}</span>
-											<span ng-if="classConfig.type == 'Number' && classConfig.name == key">{{value}}</span>
-											<span ng-if="classConfig.type == 'Boolean' && classConfig.name == key">{{value}}</span>
-											<span ng-if="classConfig.type == 'GeoPoint' && classConfig.name == key">{{value}}</span>
-											<span ng-if="classConfig.type == 'File' && classConfig.name == key"><a href="{{value.url}}" target="_blank">ver archivo</a></span>
-											<span ng-if="classConfig.type == 'Date' && classConfig.name == key">{{value.iso | date: 'short'}}</span>
-											<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key">
-												<span ng-repeat="(kk,vv) in selectChoices[classConfig.targetClass]">
-													<span ng-repeat="title in classConfig.show.title.values" ng-if="value.objectId == vv.objectId">{{vv[title.columnName]}} </span>
-													<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType === 'file'"><a href="{{vv[subTitle.columnName].url}}" target="_blank">ver archivo</a></span>
-													<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
+										<li class="list-group-item" ng-repeat="(key , value) in row" ng-if="key != 'createdAt' && key != 'objectId' && key != 'updatedAt'"><strong>{{key}}: </strong> 
+											<span ng-repeat="classConfig in class_config.find.details">	
+												<span ng-if="classConfig.type == 'String' && classConfig.name == key">{{value}}</span>
+												<span ng-if="classConfig.type == 'Number' && classConfig.name == key">{{value}}</span>
+												<span ng-if="classConfig.type == 'Boolean' && classConfig.name == key">{{value}}</span>
+												<span ng-if="classConfig.type == 'GeoPoint' && classConfig.name == key">{{value}}</span>
+												<span ng-if="classConfig.type == 'File' && classConfig.name == key"><a href="{{value.url}}" target="_blank">ver archivo</a></span>
+												<span ng-if="classConfig.type == 'Date' && classConfig.name == key">{{value.iso | date: 'short'}}</span>
+<!-- 												<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key">
+													<span ng-repeat="(kk,vv) in selectChoices[classConfig.targetClass]">
+														<span ng-repeat="title in classConfig.show.title.values" ng-if="value.objectId == vv.objectId">{{vv[title.columnName]}} </span>
+														<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType === 'file'"><a href="{{vv[subTitle.columnName].url}}" target="_blank">ver archivo</a></span>
+														<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
+													</span>
 												</span>
+												<span ng-if="classConfig.type == 'Array' && classConfig.name == key">
+														<span>{{value.length}}</span>
+												</span> -->
 											</span>
-											<span ng-if="classConfig.type == 'Array' && classConfig.name == key">
-													<span>{{value.length}}</span>
-											</span>
-										</span>
-									</li>
+										</li> 
 								</ul>
+								<input value="View" class="btn btn-default" type="button" ng-click="open()">
+								<input value="Modal View" class="btn btn-default" type="button" ng-click="open('lg')">
 								<a class="btn btn-default" href="#/class/edit/{{classname}}/{{row.objectId}}" ng-disabled="editarDisabled">Edit</a>
-								<input value="Delete" class="btn btn-default" type="button" ng-disabled="borrarDisabled" ng-click="delete_class_row(row.objectId, classname)">
+<!-- 								<input value="Delete" class="btn btn-default" type="button" ng-disabled="borrarDisabled" ng-click="delete_class_row(row.objectId, classname)"> -->
 							</div>
 						</div>
 					</div>

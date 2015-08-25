@@ -8,8 +8,8 @@ var fs = require('fs');
 
 client = new Client();
 
-var parse_user = process.env.PARSE_ACCOUNT_USER;
-var parse_password = process.env.PARSE_ACCOUNT_PASSWORD;
+var parse_user = config.PARSE_ACCOUNT_USER;
+var parse_password = config.PARSE_ACCOUNT_PASSWORD;
 
 //parse.initialize(config.parse.appId,config.parse.jsKey,config.parse.masterKey);
 // GET
