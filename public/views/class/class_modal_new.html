@@ -2,68 +2,118 @@
 		<h3 class="modal-title">Nuevo!</h3>
 	</div>
 <div class="modal-body">
-	<form class="form-horizontal">
-		<fieldset>
+	<form class="form-horizontal form-bordered" method="POST" ng-submit="create_class_row(classname)" validate>
+		<div class="form-body">
+			<div class="form-group" ng-repeat="(sort, config) in class_config.create">
+				<label class="control-label col-md-3">{{config.name | capitalize}}</label>
+				<div class="col-md-6" ng-if="config.type == 'String' && config.inputType == 'text'">
+					<div class="input-icon right">
+						<input type="text" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
+<!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+					</div>
+				</div>
+				<div class="col-md-6" ng-if="config.type == 'String' && config.inputType == 'textarea'">
+					<div class="input-icon right">
+						<textarea rows="10" cols="100"  class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
+						</textarea>
+<!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+					</div>
+				</div>
+				<div class="col-md-6" ng-if="config.type == 'File' && config.inputType == 'file'">
+					<div class="input-icon right">
+<!--                                 <input type="file" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type"> -->
+						<input type="file" name="file" onchange="angular.element(this).scope().uploadFile(angular.element(this).scope().config.name, this.files)"/>
 
-		<!-- Form Name -->
-		<legend>Form Name</legend>
-
-		<!-- Text input-->
-		<div class="control-group">
-		  <label class="control-label" for="textinput">Text Input</label>
-		  <div class="controls">
-			<input id="textinput" name="textinput" type="text" placeholder="placeholder" class="input-xlarge">
-			<p class="help-block">help</p>
-		  </div>
+						<p>{{file.name}}</p>
+					</div>
+				</div>
+				<div class="col-md-6" ng-if="config.type == 'GeoPoint' && config.inputType == 'text'">
+					<div class="input-icon right">
+						<input type="text" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
+<!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+					</div>
+				</div>
+				<div class="col-md-6" ng-if="config.type == 'Boolean' && config.inputType == 'select'">
+					<div class="input-icon right">
+						<input type="text" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
+<!--                                 <p>{{sort}}: {{class_new_row[classname][name]}}</p> -->
+					</div>
+				</div>
+				<div class="col-md-6" ng-if="config.type == 'Number' && config.inputType == 'number'">
+					<div class="input-icon right">
+						<input type="number" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
+<!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+					</div>
+				</div>
+				<div class="col-md-3" ng-if="config.type == 'Date' && config.inputType == 'datetime-local'">
+					<div class="input-icon right">
+						<input type="datetime-local" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
+<!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+					</div>
+				</div>
+				<div class="col-md-8" ng-if="config.type == 'Pointer' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
+					<ui-select ng-model="class_new_row[classname][config.name].value" theme="bootstrap" ng-disabled="disabled" style="width: 100%" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass,type: config.type}">
+						<ui-select-match placeholder="Select {{config.targetClass}}" allow-clear="true">
+							<span ng-repeat="col in config.show.title.values">
+								<span ng-if="col.className == 'this'">{{$select.selected[col.columnName]}}</span>
+								<span ng-if="col.className != 'this'">{{$select.selected[col.className][col.columnName]}}</span>
+							</span>
+							<span ng-repeat="col in config.show.subTitle.values">
+								<span ng-if="col.className == 'this'">({{$select.selected[col.columnName]}})</span>
+								<span ng-if="col.className != 'this'">({{$select.selected[col.className][col.columnName]}})</span>
+							</span>
+						</ui-select-match>
+						<ui-select-choices repeat="item.objectId as item in selectChoices[config.targetClass] | filter: $select.search">
+							<span ng-repeat="col in config.show.title.values">
+								<span ng-if="col.className == 'this'">{{item[col.columnName]}}</span>
+								<span ng-if="col.className != 'this'">{{item[col.className][col.columnName]}}</span>
+							</span>
+							<span ng-repeat="col in config.show.subTitle.values">
+								<small ng-if="col.className == 'this'">{{item[col.columnName]}}</small>
+								<small ng-if="col.className != 'this'">{{item[col.className][col.columnName]}}</small>
+							</span>
+						</ui-select-choices>
+					</ui-select>
+<!--                             <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+				</div>
+				<div class="col-md-8" ng-if="config.type == 'Array' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
+				   <ui-select multiple ng-model="class_new_row[classname][config.name].value" theme="bootstrap" style="width: 100%;" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass,type: config.type, value: []}">
+						<ui-select-match placeholder="Select choices...">
+							<span ng-repeat="col in config.show.title.values">
+								<span ng-if="col.className == 'this'">{{$item[col.columnName]}}</span>
+								<span ng-if="col.className != 'this'">{{$item[col.className][col.columnName]}}</span>
+							</span>
+							<span ng-repeat="col in config.show.subTitle.values">
+								<span ng-if="col.className == 'this'">({{$item[col.columnName]}})</span>
+								<span ng-if="col.className != 'this'">({{$item[col.className][col.columnName]}})</span>
+							</span>
+						</ui-select-match>
+						<ui-select-choices repeat="item.objectId as item in selectChoices[config.targetClass] | filter: $select.search">
+							<span ng-repeat="col in config.show.title.values">
+								<span ng-if="col.className == 'this'">{{item[col.columnName]}}</span>
+								<span ng-if="col.className != 'this'">{{item[col.className][col.columnName]}}</span>
+							</span>
+							<span ng-repeat="col in config.show.subTitle.values">
+								<small ng-if="col.className == 'this'">{{item[col.columnName]}}</small>
+								<small ng-if="col.className != 'this'">{{item[col.className][col.columnName]}}</small>
+							</span>
+						</ui-select-choices>
+					</ui-select>
+<!-- 							<p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
+				</div>
+			</div>
 		</div>
-
-		<!-- Textarea -->
-		<div class="control-group">
-		  <label class="control-label" for="textarea">Text Area</label>
-		  <div class="controls">                     
-			<textarea id="textarea" name="textarea">default text</textarea>
-		  </div>
+		<div class="form-actions">
+			<div class="row">
+				<div class="col-md-offset-3 col-md-9">
+					<!-- <button type="button" class="btn default">Cerrar</button> -->
+					<button type="submit" class="btn blue-madison" ng-disabled="guardarDisabled"><i class="fa fa-check"></i> Crear</button>
+<!--                                 <button type="button" class="btn" ng-click="clear_class_row()">Prueba</button> -->
+<!-- 								<button ng-click="subir(file)">Archivo</button> -->
+				</div>
+			</div>
 		</div>
-
-		<!-- Multiple Radios -->
-		<div class="control-group">
-		  <label class="control-label" for="radios">Multiple Radios</label>
-		  <div class="controls">
-			<label class="radio" for="radios-0">
-			  <input type="radio" name="radios" id="radios-0" value="Option one" checked="checked">
-			  Option one
-			</label>
-			<label class="radio" for="radios-1">
-			  <input type="radio" name="radios" id="radios-1" value="Option two">
-			  Option two
-			</label>
-		  </div>
-		</div>
-
-		<!-- Select Basic -->
-		<div class="control-group">
-		  <label class="control-label" for="selectbasic">Select Basic</label>
-		  <div class="controls">
-			<select id="selectbasic" name="selectbasic" class="input-xlarge">
-			  <option>Option one</option>
-			  <option>Option two</option>
-			</select>
-		  </div>
-		</div>
-
-		<!-- Select Multiple -->
-		<div class="control-group">
-		  <label class="control-label" for="selectmultiple">Select Multiple</label>
-		  <div class="controls">
-			<select id="selectmultiple" name="selectmultiple" class="input-xlarge" multiple="multiple">
-			  <option>Option one</option>
-			  <option>Option two</option>
-			</select>
-		  </div>
-		</div>
-
-		</fieldset>
-	</form>
+    </form>
 </div>
 <div class="modal-footer">
 	<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
