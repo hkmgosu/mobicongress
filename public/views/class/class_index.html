@@ -24,37 +24,7 @@
 		<div class="portlet light">
 			<div class="portlet-title">
 				<div class="caption">
-					<i class="fa fa-university font-green-sharp"></i>
-					<span class="caption-subject font-green-sharp bold uppercase">New {{classname}}</span>
-				</div>
-				<div class="tools">
-					<a href="javascript:;" class="remove">
-					</a>
-				</div>
-			</div>
-			<div class="portlet-body">
-				<div class="panel-group accordion scrollable" id="accordion1">
-					<div class="panel panel-default">
-						<div class="panel-heading">
-							<h4 class="panel-title">
-							<a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion" data-target="#new_{{classname}}">
-							<strong>New {{classname}}</strong><small> </small></a>
-							</h4>
-						</div>
-						<div id="new_{{classname}}" class="panel-collapse collapse">
-							<div class="panel-body" ng-include="'views/class/class_form.html'">
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="portlet light">
-			<div class="portlet-title">
-				<div class="caption">
-					<i class="fa fa-university font-green-sharp"></i>
-					<span class="caption-subject font-green-sharp bold uppercase">All {{class.classname}}</span>
+                    <input value="New {{classname}}" class="caption-subject font-green-sharp bold uppercase" type="button" ng-click="openNew()">
 				</div>
 				<div class="inputs">
 					<div class="portlet-input input-medium input-inline">
@@ -125,16 +95,17 @@
 												<span ng-if="classConfig.type == 'GeoPoint' && classConfig.name == key">{{value}}</span>
 												<span ng-if="classConfig.type == 'File' && classConfig.name == key"><a href="{{value.url}}" target="_blank">ver archivo</a></span>
 												<span ng-if="classConfig.type == 'Date' && classConfig.name == key">{{value.iso | date: 'short'}}</span>
-<!-- 												<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key">
+ 												<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key">
 													<span ng-repeat="(kk,vv) in selectChoices[classConfig.targetClass]">
 														<span ng-repeat="title in classConfig.show.title.values" ng-if="value.objectId == vv.objectId">{{vv[title.columnName]}} </span>
 														<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType === 'file'"><a href="{{vv[subTitle.columnName].url}}" target="_blank">ver archivo</a></span>
 														<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
 													</span>
+<!--                                                    <a ng-click="openNew()">Ver</a>-->
 												</span>
 												<span ng-if="classConfig.type == 'Array' && classConfig.name == key">
 														<span>{{value.length}}</span>
-												</span> -->
+												</span> 
 											</span>
 										</li> 
 								</ul>

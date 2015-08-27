@@ -228,60 +228,6 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 			});
 		};
 
-		$scope.class_new_row = [];
-		$scope.create_class_row = function(name) {
-			$scope.guardarDisabled = true;
-			var fd = new FormData();
-			_.each($scope.files, function(value, key) {
-				fd.append(key, value);
-				console.log(key);
-			});
-			fd.append('classname', name);
-			fd.append('info', angular.toJson($scope.class_new_row[name]));
-
-			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_new_row', fd, {
-				withCredentials: true,
-				headers: {
-					'Content-Type': undefined
-				},
-				transformRequest: angular.identity
-			}).
-			success(function(data, status, headers, config) {
-				console.log(data || "Request failed");
-				console.log(status);
-				$scope.guardarDisabled = false;
-				toaster.pop(data.type, data.title, data.detail);
-
-
-				$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-					classname: $routeParams.classname
-				}).
-				success(function(data, status, headers, config) {
-					$scope.class_rows = data;
-					$scope.class_config = data.config;
-				});
-
-			}).
-			error(function(data, status, headers, config) {
-				console.log(data || "Request failed");
-				console.log(status);
-				toaster.pop(data.type, data.title, data.detail);
-			});
-
-		};
-
-		$scope.files = {};
-		$scope.uploadFile = function(column, files) {
-			//fd.append(column, files[0]);
-			//console.log(files[0]);
-			$scope.files[column] = files[0];
-			_.each($scope.files, function(value, key) {
-				console.log(key);
-				console.log(value);
-			});
-
-		};
-
 
 		$scope.delete_class_row = function(id, name) {
 			$scope.borrarDisabled = true;
@@ -319,12 +265,12 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 		$scope.items = ['item1', 'item2', 'item3'];
 
-		$scope.openView = function(size) {
+		$scope.openNew = function(size) {
 
 			var modalInstance = $modal.open({
 				animation: true,
 				templateUrl: 'modalNew',
-				controller: 'ModalInstanceCtrl',
+				controller: 'ClassNewController',
 				size: size,
 				resolve: {
 					items: function() {
@@ -367,56 +313,109 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 	}
 ]);
 
-app.controller('ModalInstanceCtrl', function ($scope, $modalInstance, items, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
+app.controller('ClassNewController', function ($scope, $modalInstance, items, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
 
-  $scope.classname = $routeParams.classname;
+    $scope.classname = $routeParams.classname;
+    $scope.modalLoadStatus = true;
+    
+    /////////////////////////////////////////////// BEGIN CREATE FORM
 
-		$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-			classname: $routeParams.classname
-		}).
-		success(function(data, status, headers, config) {
-			$scope.class_rows = data;
-			$scope.class_config = data.config;
-		});
+        $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+            classname: $routeParams.classname
+        }).
+        success(function(data, status, headers, config) {
+            $scope.class_rows = data;
+            $scope.class_config = data.config;
+            $scope.modalLoadStatus = false;
+        });
 
-		$scope.selectChoices = [];
-		$scope.loadSelect = function(name, include) {
+        $scope.selectChoices = [];
+        $scope.loadSelect = function(name, include) {
 
-			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-				classname: name,
-				includes: include
-			}).
-			success(function(data, status, headers, config) {
+            $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+                classname: name,
+                includes: include
+            }).
+            success(function(data, status, headers, config) {
 
-				$scope.selectChoices[name] = [];
-				for (var i = 0; i < data.classdata.length; i++) {
-					if (include.length > 0) {
-						for (var j = 0; j < include.length; j++) {
-							if (include[j] == data.classdata[i].includes[j].classname) {
-								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
-								delete data.classdata[i].includes;
-								$scope.selectChoices[name].push(data.classdata[i].classdata);
-							}
-						}
-					} else {
-						$scope.selectChoices[name].push(data.classdata[i].classdata);
-					}
-				}
+                $scope.selectChoices[name] = [];
+                for (var i = 0; i < data.classdata.length; i++) {
+                    if (include.length > 0) {
+                        for (var j = 0; j < include.length; j++) {
+                            if (include[j] == data.classdata[i].includes[j].classname) {
+                                data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
+                                delete data.classdata[i].includes;
+                                $scope.selectChoices[name].push(data.classdata[i].classdata);
+                            }
+                        }
+                    } else {
+                        $scope.selectChoices[name].push(data.classdata[i].classdata);
+                    }
+                }
 
 
-			}).
-			error(function(data, status, headers, config) {
-				console.log(data);
-			});
-		};
+            }).
+            error(function(data, status, headers, config) {
+                console.log(data);
+            });
+        };
+    
+    /////////////////////////////////////////// END CREATE FORM
+    
+    
+    ////////////////////////////////////////// BEGIN SAVE NEW CLASS ROW
+    
+        $scope.class_new_row = [];
+        $scope.create_class_row = function(name) {
+            $scope.guardarDisabled = true;
+            var fd = new FormData();
+            _.each($scope.files, function(value, key) {
+                fd.append(key, value);
+                console.log(key);
+            });
+            fd.append('classname', name);
+            fd.append('info', angular.toJson($scope.class_new_row[name]));
 
+            $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_new_row', fd, {
+                withCredentials: true,
+                headers: {
+                    'Content-Type': undefined
+                },
+                transformRequest: angular.identity
+            }).
+            success(function(data, status, headers, config) {
+                console.log(data || "Request failed");
+                console.log(status);
+                $scope.guardarDisabled = false;
+                toaster.pop(data.type, data.title, data.detail);
+
+
+                $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+                    classname: $routeParams.classname
+                }).
+                success(function(data, status, headers, config) {
+                    $scope.class_rows = data;
+                    $scope.class_config = data.config;
+                });
+
+            }).
+            error(function(data, status, headers, config) {
+                console.log(data || "Request failed");
+                console.log(status);
+                toaster.pop(data.type, data.title, data.detail);
+            });
+        };
+
+        $scope.files = {};
+        $scope.uploadFile = function(column, files) {
+            $scope.files[column] = files[0];
+            _.each($scope.files, function(value, key) {
+                console.log(key);
+                console.log(value);
+            });
+        };
 	
-	
-	
-	$scope.items = items;
-  $scope.selected = {
-    item: $scope.items[0]
-  };
+    /////////////////////////////////////////////// END SAVE NEW CLASS ROW
 
   $scope.ok = function () {
     $modalInstance.close($scope.selected.item);

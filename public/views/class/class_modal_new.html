@@ -1,8 +1,9 @@
 <div class="modal-header">
-		<h3 class="modal-title">Nuevo!</h3>
+		<h3 class="modal-title">New {{classname}}</h3>
 	</div>
 <div class="modal-body">
-	<form class="form-horizontal form-bordered" method="POST" ng-submit="create_class_row(classname)" validate>
+    <div ng-show="modalLoadStatus">Loading...</div>
+	<form class="form-horizontal form-bordered" method="POST" ng-submit="create_class_row(classname)" validate ng-hide="modalLoadStatus">
 		<div class="form-body">
 			<div class="form-group" ng-repeat="(sort, config) in class_config.create">
 				<label class="control-label col-md-3">{{config.name | capitalize}}</label>
@@ -45,14 +46,14 @@
 <!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 					</div>
 				</div>
-				<div class="col-md-3" ng-if="config.type == 'Date' && config.inputType == 'datetime-local'">
+				<div class="col-md-6" ng-if="config.type == 'Date' && config.inputType == 'datetime-local'">
 					<div class="input-icon right">
 						<input type="datetime-local" class="form-control" ng-model="class_new_row[classname][config.name].value" ng-init="class_new_row[classname][config.name].type = config.type">
 <!--                                 <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 					</div>
 				</div>
 				<div class="col-md-8" ng-if="config.type == 'Pointer' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
-					<ui-select ng-model="class_new_row[classname][config.name].value" theme="bootstrap" ng-disabled="disabled" style="width: 100%" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass,type: config.type}">
+					<ui-select ng-model="class_new_row[classname][config.name].value" theme="bootstrap" ng-disabled="disabled" append-to-body="false" style="width: 100%" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass,type: config.type}">
 						<ui-select-match placeholder="Select {{config.targetClass}}" allow-clear="true">
 							<span ng-repeat="col in config.show.title.values">
 								<span ng-if="col.className == 'this'">{{$select.selected[col.columnName]}}</span>
@@ -77,7 +78,7 @@
 <!--                             <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 				</div>
 				<div class="col-md-8" ng-if="config.type == 'Array' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
-				   <ui-select multiple ng-model="class_new_row[classname][config.name].value" theme="bootstrap" style="width: 100%;" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass,type: config.type, value: []}">
+				   <ui-select multiple ng-model="class_new_row[classname][config.name].value" theme="bootstrap"  append-to-body="false" style="width: 100%;" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass,type: config.type, value: []}">
 						<ui-select-match placeholder="Select choices...">
 							<span ng-repeat="col in config.show.title.values">
 								<span ng-if="col.className == 'this'">{{$item[col.columnName]}}</span>
