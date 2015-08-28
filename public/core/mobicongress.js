@@ -321,7 +321,7 @@ app.controller('ClassNewController', function ($scope, $modalInstance, items, $r
     /////////////////////////////////////////////// BEGIN CREATE FORM
 
         $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-            classname: $routeParams.classname
+            classname: $scope.classname
         }).
         success(function(data, status, headers, config) {
             $scope.class_rows = data;
@@ -416,13 +416,34 @@ app.controller('ClassNewController', function ($scope, $modalInstance, items, $r
         };
 	
     /////////////////////////////////////////////// END SAVE NEW CLASS ROW
+    
+    $scope.crear = function(size, classname) {
 
-  $scope.ok = function () {
-    $modalInstance.close($scope.selected.item);
-  };
+			var modalInstance = $modal.open({
+				animation: true,
+				templateUrl: 'modalNew',
+				controller: 'ClassNewController',
+				size: size,
+				resolve: {
+					items: function() {
+						return $scope.items;
+					}
+				}
+			});
 
-  $scope.cancel = function () {
-    $modalInstance.dismiss('cancel');
+			modalInstance.result.then(function(selectedItem) {
+				$scope.selected = selectedItem;
+			}, function() {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+		};
+
+      $scope.ok = function () {
+        $modalInstance.close($scope.selected.item);
+      };
+
+      $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
   };
 });
 

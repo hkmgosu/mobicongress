@@ -75,6 +75,7 @@
 							</span>
 						</ui-select-choices>
 					</ui-select>
+                    <button class="btn btn-primary" type="button" ng-click="crear('', classname)">Crear</button>
 <!--                             <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 				</div>
 				<div class="col-md-8" ng-if="config.type == 'Array' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
@@ -100,6 +101,7 @@
 							</span>
 						</ui-select-choices>
 					</ui-select>
+                    <button class="btn btn-primary" type="button" ng-click="crear('', classname)">Crear</button>
 <!-- 							<p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 				</div>
 			</div>
