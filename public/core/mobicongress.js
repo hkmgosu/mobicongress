@@ -256,15 +256,11 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 				toaster.pop(data.type, data.title, data.detail);
 			});
 		};
-
-
-
-
 		
-
-
-		$scope.items = ['item1', 'item2', 'item3'];
-
+		
+		
+		$scope.items = [];
+		
 		$scope.openNew = function(size) {
             
             $rootScope.modalClass = $routeParams.classname;
@@ -283,32 +279,53 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 			modalInstance.result.then(function(result) {
 				console.log(result);
-                
-                
                 $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-			classname: $routeParams.classname
-		}).
-		success(function(data, status, headers, config) {
-			$scope.class_rows = data;
-			$scope.class_config = data.config;
-		});
-
-                
-                
-                
+					classname: $routeParams.classname
+				}).
+				success(function(data, status, headers, config) {
+					$scope.class_rows = data;
+					$scope.class_config = data.config;
+				});
 			}, function() {
 				$log.info('Modal dismissed at: ' + new Date());
 			});
+			
 		};
         
-        $scope.openView = function(size) {
+        $scope.openView = function(size, classname, objectId) {
             
-            $rootScope.modalClass = $routeParams.classname;
+            $rootScope.modalClass = classname;
+			$rootScope.modalClassObjectId = objectId;
 
 			var modalInstance = $modal.open({
 				animation: true,
 				templateUrl: 'modalView',
 				controller: 'ClassViewController',
+				size: size,
+				resolve: {
+					items: function() {
+						return $scope.items;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(result) {
+				console.log(result);
+			}, function() {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+		};
+		
+		
+		 $scope.openEdit = function(size, classname, objectId) {
+            
+            $rootScope.modalClass = classname;
+			$rootScope.modalClassObjectId = objectId;
+
+			var modalInstance = $modal.open({
+				animation: true,
+				templateUrl: 'modalEdit',
+				controller: 'ClassEditController',
 				size: size,
 				resolve: {
 					items: function() {
@@ -471,19 +488,16 @@ app.controller('ClassNewController', function ($scope, $modalInstance, items, $r
   };
 });
 
-
 app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_', 'toaster', 'Upload',
 	function($scope, $rootScope, $location, $http, $routeParams, $filter, _, toaster, Upload) {
 
-		$rootScope.title = "Mobicongress | " + $routeParams.classname;
-		$rootScope.page_title = "Class: " + $routeParams.classname;
-		$rootScope.page_desc = $routeParams.classname + " de la Aplicación";
-		$rootScope.active = $routeParams.classname;
-		$scope.classname = $routeParams.classname;
+		$scope.classname = $rootScope.modalClass;
+		$scope.classid = $rootScope.modalClassObjectId;
+		$scope.modalLoadStatus = true;
 
 		$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-			classname: $routeParams.classname,
-			object_id: $routeParams.object_id
+			classname: $scope.classname,
+			object_id: $scope.classid
 		}).
 		success(function(data, status, headers, config) {
 
@@ -609,138 +623,87 @@ app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$ht
 app.controller('ClassViewController', function ($scope, $modalInstance, items, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
 
     $scope.classname = $rootScope.modalClass;
+	$scope.classid = $rootScope.modalClassObjectId;
     $scope.modalLoadStatus = true;
-    console.log(items);
     
-    /////////////////////////////////////////////// BEGIN CREATE FORM
+	$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+			classname: $scope.classname,
+			object_id: $scope.classid
+		}).
+		success(function(data, status, headers, config) {
 
-        $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-            classname: $scope.classname
-        }).
-        success(function(data, status, headers, config) {
-            $scope.class_rows = data;
-            $scope.class_config = data.config;
-            $scope.modalLoadStatus = false;
-        });
+			$scope.class_config = data.config;
+			$scope.class_view_row = {};
+			$scope.modalLoadStatus = false;
+			console.log(data);
 
-        $scope.selectChoices = [];
-        $scope.loadSelect = function(name, include) {
-
-            $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-                classname: name,
-                includes: include
-            }).
-            success(function(data, status, headers, config) {
-
-                $scope.selectChoices[name] = [];
-                for (var i = 0; i < data.classdata.length; i++) {
-                    if (include.length > 0) {
-                        for (var j = 0; j < include.length; j++) {
-                            if (include[j] == data.classdata[i].includes[j].classname) {
-                                data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
-                                delete data.classdata[i].includes;
-                                $scope.selectChoices[name].push(data.classdata[i].classdata);
-                            }
-                        }
-                    } else {
-                        $scope.selectChoices[name].push(data.classdata[i].classdata);
-                    }
-                }
-
-
-            }).
-            error(function(data, status, headers, config) {
-                console.log(data);
-            });
-        };
-    
-    /////////////////////////////////////////// END CREATE FORM
-    
-    
-    ////////////////////////////////////////// BEGIN SAVE NEW CLASS ROW
-    
-        $scope.class_new_row = [];
-        $scope.create_class_row = function(name) {
-            $scope.guardarDisabled = true;
-            var fd = new FormData();
-            _.each($scope.files, function(value, key) {
-                fd.append(key, value);
-                console.log(key);
-            });
-            fd.append('classname', name);
-            fd.append('info', angular.toJson($scope.class_new_row[name]));
-
-            $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_new_row', fd, {
-                withCredentials: true,
-                headers: {
-                    'Content-Type': undefined
-                },
-                transformRequest: angular.identity
-            }).
-            success(function(data, status, headers, config) {
-                console.log(data);
-                console.log(status);
-                $scope.guardarDisabled = false;
-                $modalInstance.close(data);
-                toaster.pop(data.type, data.title, data.detail);
-
-
-                $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
-                    classname: $routeParams.classname
-                }).
-                success(function(data, status, headers, config) {
-                    $scope.class_rows = data;
-                    $scope.class_config = data.config;
-                });
-
-            }).
-            error(function(data, status, headers, config) {
-                console.log(data || "Request failed");
-                console.log(status);
-                toaster.pop(data.type, data.title, data.detail);
-            });
-        };
-
-        $scope.files = {};
-        $scope.uploadFile = function(column, files) {
-            $scope.files[column] = files[0];
-            _.each($scope.files, function(value, key) {
-                console.log(key);
-                console.log(value);
-            });
-        };
-	
-    /////////////////////////////////////////////// END SAVE NEW CLASS ROW
-    
-    $scope.crear = function(size, classname, include) {
-        
-            $rootScope.modalClass = classname;
-
-			var modalInstance = $modal.open({
-				animation: true,
-				templateUrl: 'modalNew',
-				controller: 'ClassNewController',
-				size: size,
-				resolve: {
-					items: function() {
-						return $scope.items;
+			$scope.class_view_row.objectId = data.classdata[0].objectId;
+			_.each(data.config.update, function(value, key) {
+				if (data.classdata[0][value.name] !== undefined) {
+					if (value.type == 'String' && value.inputType == 'text' || value.inputType == 'textarea') {
+						$scope.class_view_row[value.name] = data.classdata[0][value.name];
+					} else if (value.type == 'Date' && value.inputType == 'datetime-local') {
+						$scope.class_view_row[value.name] = new Date(data.classdata[0][value.name].iso);
+					} else if (value.type == 'Pointer' && value.inputType == 'select') {
+						$scope.class_view_row[value.name] = data.classdata[0][value.name].objectId;
+					} else if (value.type == 'Array' && value.inputType == 'select') {
+						var paso = [];
+						for (var i = 0; i < data.classdata[0][value.name].length; i++) {
+							paso.push(data.classdata[0][value.name][i].objectId);
+						}
+						$scope.class_view_row[value.name] = paso;
+					} else {
+						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					}
+				} else {
+					/* 						console.log(value.name);
+						console.log(value); */
 				}
 			});
 
-			modalInstance.result.then(function(result) {
-				console.log(result);
-                $scope.loadSelect(classname,include);
-			}, function() {
-				$log.info('Modal dismissed at: ' + new Date());
+			console.log($scope.class_view_row);
+
+		});
+
+
+		$scope.selectChoices = [];
+		$scope.loadSelect = function(name, include) {
+
+			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+				classname: name,
+				includes: include
+			}).
+			success(function(data, status, headers, config) {
+
+				$scope.selectChoices[name] = [];
+				for (var i = 0; i < data.classdata.length; i++) {
+					if (include.length > 0) {
+						for (var j = 0; j < include.length; j++) {
+							if (include[j] == data.classdata[i].includes[j].classname) {
+								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
+								delete data.classdata[i].includes;
+								$scope.selectChoices[name].push(data.classdata[i].classdata);
+							}
+						}
+					} else {
+						$scope.selectChoices[name].push(data.classdata[i].classdata);
+					}
+				}
+
+
+			}).
+			error(function(data, status, headers, config) {
+				console.log(data);
 			});
 		};
-
-      $scope.ok = function () {
+	
+	 $scope.ok = function () {
         $modalInstance.close($rootScope.modalClass);
       };
 
       $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
-  };
+	  };
+	
+	
 });

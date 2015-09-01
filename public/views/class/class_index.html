@@ -85,7 +85,7 @@
 						</div>
 						<div id="{{row.objectId}}" class="panel-collapse collapse">
 							<div class="panel-body">
-								<ul class="list-group">
+<!-- 								<ul class="list-group">
 									<h4>Details</h4>
 										<li class="list-group-item" ng-repeat="(key , value) in row" ng-if="key != 'createdAt' && key != 'objectId' && key != 'updatedAt'"><strong>{{key}}: </strong> 
 											<span ng-repeat="classConfig in class_config.find.details">	
@@ -101,18 +101,17 @@
 														<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType === 'file'"><a href="{{vv[subTitle.columnName].url}}" target="_blank">ver archivo</a></span>
 														<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
 													</span>
-<!--                                                    <a ng-click="openNew()">Ver</a>-->
+                                                   <a ng-click="openNew()">Ver</a>
 												</span>
 												<span ng-if="classConfig.type == 'Array' && classConfig.name == key">
 														<span>{{value.length}}</span>
 												</span> 
 											</span>
 										</li> 
-								</ul>
-								<input value="Modal View" class="btn btn-default" type="button" ng-click="openView('lg')">
-								<input value="Modal Edit" class="btn btn-default" type="button" ng-click="openEdit('lg')">
-								<a class="btn btn-default" href="#/class/edit/{{classname}}/{{row.objectId}}" ng-disabled="editarDisabled">Edit</a>
-<!-- 								<input value="Delete" class="btn btn-default" type="button" ng-disabled="borrarDisabled" ng-click="delete_class_row(row.objectId, classname)"> -->
+								</ul> -->
+								<input value="View" class="btn btn-default" type="button" ng-click="openView('', classname, row.objectId)">
+								<input value="Edit" class="btn btn-default" type="button" ng-click="openEdit('', classname, row.objectId)">
+ 								<input value="Delete" class="btn btn-default" type="button" ng-disabled="borrarDisabled" ng-click="delete_class_row(row.objectId, classname)">
 							</div>
 						</div>
 					</div>
