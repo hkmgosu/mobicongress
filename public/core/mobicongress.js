@@ -122,13 +122,14 @@ app.controller("HomeController", ["$scope", "$rootScope", "$location", "$http",
 		$rootScope.page_title = "Parse Apps";
 		$rootScope.page_desc = "...";
 		$rootScope.active = "dashboard";
-
+		$scope.modalLoadStatus = true;
 
 		$scope.mapp = {};
 
 		$http.get('/api/mobiapps').
 		success(function(data, status, headers, config) {
 			$scope.mapps = data;
+			$scope.modalLoadStatus = false;
 		});
 
 		if ($location.url() == "/") {
@@ -188,6 +189,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		$rootScope.page_desc = $routeParams.classname + " de la Aplicación";
 		$rootScope.active = $routeParams.classname;
 		$scope.classname = $routeParams.classname;
+		$scope.modalLoadStatus = true;
 
 		$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 			classname: $routeParams.classname
@@ -195,6 +197,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		success(function(data, status, headers, config) {
 			$scope.class_rows = data;
 			$scope.class_config = data.config;
+			$scope.modalLoadStatus = false;
 		});
 
 		$scope.selectChoices = [];
@@ -336,6 +339,13 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 
 			modalInstance.result.then(function(result) {
 				console.log(result);
+				$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+					classname: $routeParams.classname
+				}).
+				success(function(data, status, headers, config) {
+					$scope.class_rows = data;
+					$scope.class_config = data.config;
+				});
 			}, function() {
 				$log.info('Modal dismissed at: ' + new Date());
 			});

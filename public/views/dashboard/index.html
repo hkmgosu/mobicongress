@@ -59,7 +59,8 @@
                 </ul>
             </div>
             <div class="portlet-body">
-                <div class="panel-group accordion scrollable" id="accordion2">
+				<div ng-show="modalLoadStatus">Loading...</div>
+                <div class="panel-group accordion scrollable" id="accordion2" ng-hide="modalLoadStatus">
                     <div class="panel panel-default" ng-repeat="mapp in mapps | filter: query | limitTo: quantity">
                         <div class="panel-heading">
                             <h4 class="panel-title">
