@@ -75,7 +75,7 @@
 							</span>
 						</ui-select-choices>
 					</ui-select>
-                    <button class="btn btn-primary" type="button" ng-click="crear('', config.targetClass, config.include)">Crear</button>
+                    <button class="btn btn-primary" type="button" ng-click="crear('', config.targetClass, config.include)">nuevo</button>
 <!--                             <p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 				</div>
 				<div class="col-md-8" ng-if="config.type == 'Array' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
@@ -101,7 +101,7 @@
 							</span>
 						</ui-select-choices>
 					</ui-select>
-                    <button class="btn btn-primary" type="button" ng-click="crear('', config.targetClass, config.include)">Crear</button>
+                    <button class="btn btn-primary" type="button" ng-click="crear('', config.targetClass, config.include)">nuevo</button>
 <!-- 							<p>{{sort}}: {{class_new_row[classname][config.name]}}</p> -->
 				</div>
 			</div>
@@ -110,7 +110,7 @@
 			<div class="row">
 				<div class="col-md-offset-3 col-md-9">
 					<!-- <button type="button" class="btn default">Cerrar</button> -->
-					<button type="submit" class="btn blue-madison" ng-disabled="guardarDisabled"><i class="fa fa-check"></i> Crear</button>
+					<button type="submit" class="btn blue-madison" ng-disabled="guardarDisabled"><i class="fa fa-check"></i> Guardar</button>
 <!--                                 <button type="button" class="btn" ng-click="clear_class_row()">Prueba</button> -->
 <!-- 								<button ng-click="subir(file)">Archivo</button> -->
 				</div>
@@ -119,6 +119,6 @@
     </form>
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-	<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+<!-- 	<button class="btn btn-primary" type="button" ng-click="ok()">OK</button> -->
+	<button class="btn btn-warning" type="button" ng-click="cancel()">Volver</button>
 </div>

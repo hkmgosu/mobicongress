@@ -21,14 +21,12 @@
 										<span ng-if="classConfig.type == 'GeoPoint' && classConfig.name == key">{{value}}</span>
 										<span ng-if="classConfig.type == 'File' && classConfig.name == key"><img class="img-responsive img-thumbnail" src="{{value.url}}" alt=""></span>
 										<span ng-if="classConfig.type == 'Date' && classConfig.name == key">{{value | date: 'short'}}</span>
-										<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key">
-											{{value}}
+										<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key" ng-init="loadSelect(classConfig.targetClass, value.objectId, classConfig.include)">
 											<span ng-repeat="(kk,vv) in selectChoices[classConfig.targetClass]">
-												<span ng-repeat="title in classConfig.show.title.values" ng-if="value.objectId == vv.objectId">{{vv[title.columnName]}} </span>
-												<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType === 'file'"><a href="{{vv[subTitle.columnName].url}}" target="_blank">ver archivo</a></span>
-												<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="value.objectId == vv.objectId && subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
+												<span ng-repeat="title in classConfig.show.title.values" >{{vv[title.columnName]}} </span>
+												<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="subTitle.inputType === 'file'"><img class="img-responsive img-thumbnail" src="{{vv[subTitle.columnName].url}}"></span>
+												<span ng-repeat="subTitle in classConfig.show.subTitle.values" ng-if="subTitle.inputType !== 'file'">{{vv[subTitle.columnName]}}</span>
 											</span>
-<!--                                                    <a ng-click="openNew()">Ver</a>-->
 										</span>
 										<span ng-if="classConfig.type == 'Array' && classConfig.name == key">
 												<span>{{value.length}}</span>
@@ -44,6 +42,6 @@
 
 </div>
 <div class="modal-footer">
-	<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
-	<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+<!-- 	<button class="btn btn-primary" type="button" ng-click="ok()">OK</button> -->
+	<button class="btn btn-warning" type="button" ng-click="cancel()">Volver</button>
 </div>

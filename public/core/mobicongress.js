@@ -479,17 +479,17 @@ app.controller('ClassNewController', function ($scope, $modalInstance, items, $r
 			});
 		};
 
-      $scope.ok = function () {
-        $modalInstance.close($rootScope.modalClass);
-      };
+	$scope.ok = function () {
+		$modalInstance.close($rootScope.modalClass);
+	};
 
-      $scope.cancel = function () {
-        $modalInstance.dismiss('cancel');
-  };
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+	
 });
 
-app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_', 'toaster', 'Upload',
-	function($scope, $rootScope, $location, $http, $routeParams, $filter, _, toaster, Upload) {
+app.controller("ClassEditController", function($scope, $modalInstance, items, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
 
 		$scope.classname = $rootScope.modalClass;
 		$scope.classid = $rootScope.modalClassObjectId;
@@ -504,7 +504,8 @@ app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$ht
 			$scope.class_config = data.config;
 			$scope.class_edit_row = {};
 			console.log(data);
-
+			$scope.modalLoadStatus = false;
+			
 			$scope.class_edit_row.objectId = data.classdata[0].objectId;
 			_.each(data.config.update, function(value, key) {
 				if (data.classdata[0][value.name] !== undefined) {
@@ -616,9 +617,44 @@ app.controller("ClassEditController", ["$scope", "$rootScope", "$location", "$ht
 			});
 		};
 
+		
+	$scope.crear = function(size, classname, include) {
+        
+            $rootScope.modalClass = classname;
 
-	}
-]);
+			var modalInstance = $modal.open({
+				animation: true,
+				templateUrl: 'modalNew',
+				controller: 'ClassNewController',
+				size: size,
+				resolve: {
+					items: function() {
+						return $scope.items;
+					}
+				}
+			});
+
+			modalInstance.result.then(function(result) {
+				console.log(result);
+                $scope.loadSelect(classname,include);
+			}, function() {
+				$log.info('Modal dismissed at: ' + new Date());
+			});
+		};
+
+	$scope.ok = function () {
+		$modalInstance.close($rootScope.modalClass);
+	};
+
+	$scope.cancel = function () {
+		$modalInstance.dismiss('cancel');
+	};
+		
+		
+		
+		
+		
+});
 
 app.controller('ClassViewController', function ($scope, $modalInstance, items, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
 
@@ -635,9 +671,7 @@ app.controller('ClassViewController', function ($scope, $modalInstance, items, $
 			$scope.class_config = data.config;
 			$scope.class_view_row = {};
 			$scope.modalLoadStatus = false;
-			console.log(data);
 
-			$scope.class_view_row.objectId = data.classdata[0].objectId;
 			_.each(data.config.update, function(value, key) {
 				if (data.classdata[0][value.name] !== undefined) {
 					if (value.type == 'String' && value.inputType == 'text' || value.inputType == 'textarea') {
@@ -645,35 +679,42 @@ app.controller('ClassViewController', function ($scope, $modalInstance, items, $
 					} else if (value.type == 'Date' && value.inputType == 'datetime-local') {
 						$scope.class_view_row[value.name] = new Date(data.classdata[0][value.name].iso);
 					} else if (value.type == 'Pointer' && value.inputType == 'select') {
-						$scope.class_view_row[value.name] = data.classdata[0][value.name].objectId;
+						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					} else if (value.type == 'Array' && value.inputType == 'select') {
-						var paso = [];
+/* 						var paso = [];
 						for (var i = 0; i < data.classdata[0][value.name].length; i++) {
 							paso.push(data.classdata[0][value.name][i].objectId);
 						}
-						$scope.class_view_row[value.name] = paso;
+						$scope.class_view_row[value.name] = paso; */
+						$scope.class_view_row[value.name] = data.classdata[0][value.name]
 					} else {
 						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					}
 				} else {
-					/* 						console.log(value.name);
-						console.log(value); */
+					console.log('ERROR');
+					console.log(value.name);
+					console.log(value); 
 				}
 			});
 
-			console.log($scope.class_view_row);
 
-		});
+		}).
+			error(function(data, status, headers, config) {
+				console.log(data);
+			});
 
 
 		$scope.selectChoices = [];
-		$scope.loadSelect = function(name, include) {
+		$scope.loadSelect = function(name, id ,include) {
 
 			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 				classname: name,
-				includes: include
+				includes: include,
+				object_id: id
 			}).
 			success(function(data, status, headers, config) {
+				
+				console.log(data);
 
 				$scope.selectChoices[name] = [];
 				for (var i = 0; i < data.classdata.length; i++) {
