@@ -55,7 +55,7 @@
                             </div>
                         </div>
                         <div class="col-md-8" ng-if="config.type == 'Pointer' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
-                            <ui-select ng-model="class_new_row[classname][config.name].value" theme="bootstrap" ng-disabled="disabled" style="width: 100%" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass, type: config.type, value: class_edit_row[config.name]}">
+                            <ui-select ng-model="class_new_row[classname][config.name].value" theme="bootstrap" ng-disabled="disabled" append-to-body="false" style="width: 100%" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass, type: config.type, value: class_edit_row[config.name]}">
                                 <ui-select-match placeholder="Select {{config.targetClass}}" allow-clear="true">
 									<span ng-repeat="col in config.show.title.values">
 										<span ng-if="col.className == 'this'">{{$select.selected[col.columnName]}}</span>
@@ -81,7 +81,7 @@
 							<button class="btn btn-primary" type="button" ng-click="crear('', config.targetClass, config.include)">nuevo</button>
                         </div>
                         <div class="col-md-8" ng-if="config.type == 'Array' && config.inputType == 'select'" ng-init="loadSelect(config.targetClass, config.include)">
-                           <ui-select multiple ng-model="class_new_row[classname][config.name].value" theme="bootstrap" style="width: 100%;" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass, type: config.type, value: class_edit_row[config.name]}">
+                           <ui-select multiple ng-model="class_new_row[classname][config.name].value" theme="bootstrap" style="width: 100%;" append-to-body="false" ng-init="class_new_row[classname][config.name] = {targetClass: config.targetClass, type: config.type, value: class_edit_row[config.name]}">
                                 <ui-select-match placeholder="Select choices...">
 									<span ng-repeat="col in config.show.title.values">
 										<span ng-if="col.className == 'this'">{{$item[col.columnName]}}</span>

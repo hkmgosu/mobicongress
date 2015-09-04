@@ -696,7 +696,7 @@ app.controller('ClassViewController', function ($scope, $modalInstance, items, $
 							paso.push(data.classdata[0][value.name][i].objectId);
 						}
 						$scope.class_view_row[value.name] = paso; */
-						$scope.class_view_row[value.name] = data.classdata[0][value.name]
+						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					} else {
 						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					}
