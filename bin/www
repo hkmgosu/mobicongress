@@ -5,7 +5,9 @@
  */
 
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
-
+process.env.MONGOLAB_URI = process.env.MONGOLAB_URI || "mongodb://admin:mobicongress0199@ds059692.mongolab.com:59692/mobicongress";
+process.env.PARSE_ACCOUNT_USER = process.env.PARSE_ACCOUNT_USER || "evolutionaimagos@gmail.com";
+process.env.PARSE_ACCOUNT_PASSWORD = process.env.PARSE_ACCOUNT_PASSWORD || "mobicongress0199";
 
 
 
