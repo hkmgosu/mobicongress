@@ -10,18 +10,17 @@
 
 <!-- BEGIN PAGE BREADCRUMB -->
 <ul class="page-breadcrumb breadcrumb">
-	<li>
-		<a href="#/">Home</a><i class="fa fa-circle"></i>
-	</li>
-	<li class="active" ng-bind="active">
-
-	</li>
+    <li ng-repeat="link in breadcrumb">
+        <span ng-if="!$last"><a href="{{link.url}}">{{link.name}} </a><i class="fa fa-circle"></i></span>
+		<span ng-if="$last"> {{link.name}}</span>
+    </li>
 </ul>
 <!-- END PAGE BREADCRUMB -->
 <!-- BEGIN PAGE CONTENT INNER -->
 <div class="row">
 	<div class="col-md-12">
-		<div class="portlet light">
+		<div class="text-center" ng-hide="dataLoadStatus"><img src="./assets/global/img/301.gif" alt=""></div>
+        <div class="portlet light" ng-show="dataLoadStatus">
 			<div class="portlet-title">
 				<div class="caption">
                     <input value="New {{classname}}" class="caption-subject font-green-sharp bold uppercase" type="button" ng-click="openNew()">
@@ -61,8 +60,7 @@
 				</ul>
 			</div>	 -->
 			<div class="portlet-body">
-				<div ng-show="modalLoadStatus">Loading...</div>
-				<div class="panel-group accordion scrollable" id="accordion2" ng-hide="modalLoadStatus">
+				<div class="panel-group accordion scrollable" id="accordion2">
 					<div class="panel panel-default" ng-repeat="row in class_rows.classdata | filter: query | orderBy: '-createdAt'">
 						<div class="panel-heading">
 							<h4 class="panel-title">

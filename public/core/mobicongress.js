@@ -24,11 +24,6 @@ app.config(function($routeProvider, uiSelectConfig) {
 		controller: 'ClassController'
 	})
 
-	.when('/class/edit/:classname/:object_id', {
-		templateUrl: 'views/class/class_form_edit.html',
-		controller: 'ClassEditController'
-	})
-
 	.otherwise({
 		redirectTo: '/'
 	});
@@ -102,34 +97,24 @@ app.controller("MainController", ["$scope", "$rootScope", "$location", "$http",
 		success(function(data, status, headers, config) {
 			$scope.user = data;
 		});
-
-		$rootScope.flash = {
-			status: false,
-			class: 'success',
-			type: 'success!',
-			message: 'Bienvenido'
-		};
-
-
-
 	}
 ]);
 
 app.controller("HomeController", ["$scope", "$rootScope", "$location", "$http",
 	function($scope, $rootScope, $location, $http) {
-
+		$rootScope.home = {name: 'Home', url:'#/'}; 
 		$rootScope.title = "Mobicongress | Dashboard";
 		$rootScope.page_title = "Parse Apps";
 		$rootScope.page_desc = "...";
-		$rootScope.active = "dashboard";
-		$scope.modalLoadStatus = true;
+		$rootScope.breadcrumb = [$rootScope.home];
+		$rootScope.dataLoadStatus = false;
 
 		$scope.mapp = {};
 
 		$http.get('/api/mobiapps').
 		success(function(data, status, headers, config) {
 			$scope.mapps = data;
-			$scope.modalLoadStatus = false;
+			$rootScope.dataLoadStatus = true;
 		});
 
 		if ($location.url() == "/") {
@@ -143,39 +128,17 @@ app.controller("HomeController", ["$scope", "$rootScope", "$location", "$http",
 
 app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routeParams", "$location",
 	function($scope, $rootScope, $http, $routeParams, $location) {
-
+		$rootScope.mobiapp = {name: 'mobiApp', url: '#' + $location.url()};
 		$rootScope.title = "Mobicongress | MobiApps";
 		$rootScope.page_title = "Classes";
 		$rootScope.page_desc = "...";
-		$rootScope.active = "MobiApp";
-		$scope.schema_data = [];
-		$scope.hide_contain = true;
-		$scope.loading = 0;
-
-		console.log($location.protocol());
+		$rootScope.breadcrumb = [$rootScope.home, $rootScope.mobiapp];
+		$rootScope.dataLoadStatus = false;
 
 		$http.get('/api/mobiapps_get/' + $routeParams.mobiapp_id).then(function(result) {
-			//console.log(result);
-			return result.data;
-		}).then(function(result) {
-
-			var total = result.classes.length;
-			var i = 0;
-
-			_.each(result.classes, function(value, key) {
-				$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows/', {
-					applicationId: result.applicationId,
-					masterKey: result.masterKey,
-					javascriptKey: result.javascriptKey,
-					classname: value.className
-				}).then(function(result) {
-					$scope.schema_data.push(result.data);
-					i++;
-					$scope.loading = (i * 100) / total;
-					if (i == total) $scope.hide_contain = false;
-				});
-			});
-
+			console.log(result.data);
+			$scope.schema_data = result.data;
+			$rootScope.dataLoadStatus = true;
 		});
 
 	}
@@ -183,13 +146,13 @@ app.controller("MobiAppController", ["$scope", "$rootScope", "$http", "$routePar
 
 app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http", "$routeParams", '$filter', '_', 'toaster', '$modal', '$log', 'Upload',
 	function($scope, $rootScope, $location, $http, $routeParams, $filter, _, toaster, $modal, $log, Upload) {
-
+		$rootScope.parseClass = {name: $routeParams.classname, url: '#' + $location.url()};
 		$rootScope.title = "Mobicongress | " + $routeParams.classname;
 		$rootScope.page_title = "Class: " + $routeParams.classname;
 		$rootScope.page_desc = $routeParams.classname + " de la Aplicación";
-		$rootScope.active = $routeParams.classname;
+		$rootScope.breadcrumb = [$rootScope.home, $rootScope.mobiapp, $rootScope.parseClass];
 		$scope.classname = $routeParams.classname;
-		$scope.modalLoadStatus = true;
+		$rootScope.dataLoadStatus = false;
 
 		$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
 			classname: $routeParams.classname
@@ -197,7 +160,7 @@ app.controller("ClassController", ["$scope", "$rootScope", "$location", "$http",
 		success(function(data, status, headers, config) {
 			$scope.class_rows = data;
 			$scope.class_config = data.config;
-			$scope.modalLoadStatus = false;
+			$rootScope.dataLoadStatus = true;
 		});
 
 		$scope.selectChoices = [];
@@ -555,17 +518,19 @@ app.controller("ClassEditController", function($scope, $modalInstance, items, $r
 			success(function(data, status, headers, config) {
 
 				$scope.selectChoices[name] = [];
-				for (var i = 0; i < data.classdata.length; i++) {
-					if (include.length > 0) {
-						for (var j = 0; j < include.length; j++) {
-							if (include[j] == data.classdata[i].includes[j].classname) {
-								data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
-								delete data.classdata[i].includes;
-								$scope.selectChoices[name].push(data.classdata[i].classdata);
+				if(data.classdata.length > 0){
+					for (var i = 0; i < data.classdata.length; i++) {
+						if (include.length > 0) {
+							for (var j = 0; j < include.length; j++) {
+								if (include[j] == data.classdata[i].includes[j].classname) {
+									data.classdata[i].classdata[include[j]] = data.classdata[i].includes[j].classdata;
+									delete data.classdata[i].includes;
+									$scope.selectChoices[name].push(data.classdata[i].classdata);
+								}
 							}
+						} else {
+							$scope.selectChoices[name].push(data.classdata[i].classdata);
 						}
-					} else {
-						$scope.selectChoices[name].push(data.classdata[i].classdata);
 					}
 				}
 
@@ -601,8 +566,17 @@ app.controller("ClassEditController", function($scope, $modalInstance, items, $r
 				console.log(data || "Request failed");
 				console.log(status);
 				$scope.guardarDisabled = false;
-				$location.path("/class/" + $scope.classname);
-				toaster.pop(data.type, data.title, data.detail);
+                $modalInstance.close(data);
+                toaster.pop(data.type, data.title, data.detail);
+
+
+                $http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows', {
+                    classname: $routeParams.classname
+                }).
+                success(function(data, status, headers, config) {
+                    $scope.class_rows = data;
+                    $scope.class_config = data.config;
+                });
 
 
 
@@ -691,11 +665,11 @@ app.controller('ClassViewController', function ($scope, $modalInstance, items, $
 					} else if (value.type == 'Pointer' && value.inputType == 'select') {
 						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					} else if (value.type == 'Array' && value.inputType == 'select') {
-/* 						var paso = [];
+ 						var paso = [];
 						for (var i = 0; i < data.classdata[0][value.name].length; i++) {
 							paso.push(data.classdata[0][value.name][i].objectId);
 						}
-						$scope.class_view_row[value.name] = paso; */
+						$scope.class_view_row[value.name] = paso;
 						$scope.class_view_row[value.name] = data.classdata[0][value.name];
 					} else {
 						$scope.class_view_row[value.name] = data.classdata[0][value.name];

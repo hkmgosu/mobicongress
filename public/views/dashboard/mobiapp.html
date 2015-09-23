@@ -1,23 +1,16 @@
 <!-- BEGIN PAGE BREADCRUMB -->
 <ul class="page-breadcrumb breadcrumb">
-    <li>
-        <a href="#/">Home</a><i class="fa fa-circle"></i>
-    </li>
-    <li class="active" ng-bind="active">
-
+    <li ng-repeat="link in breadcrumb">
+        <span ng-if="!$last"><a href="{{link.url}}">{{link.name}} </a><i class="fa fa-circle"></i></span>
+		<span ng-if="$last"> {{link.name}}</span>
     </li>
 </ul>
 <!-- END PAGE BREADCRUMB -->
 <!-- BEGIN PAGE CONTENT INNER -->
 <div class="row">
-    <div class="col-md-12" ng-show="flash.status">
-        <div class="alert alert-{{flash.class}} alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <strong>{{flash.type}}</strong> {{flash.message}}
-        </div>
-    </div>
     <div class="col-md-12">
-        <div class="portlet light">
+        <div class="text-center" ng-hide="dataLoadStatus"><img  src="./assets/global/img/301.gif" alt=""></div>
+        <div class="portlet light" ng-show="dataLoadStatus">
             <div class="portlet-title">
                 <div class="caption">
                     <i class="fa fa-university font-green-sharp"></i>
@@ -34,14 +27,14 @@
             </div>
             <div class="portlet-body">
                 <div class="row">
-                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="class in schema_data | filter: query | orderBy: 'classname'" ng-hide="hide_contain">
+                    <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="class in schema_data | filter: query | orderBy: 'classname'">
                         <a class="dashboard-stat dashboard-stat-light blue-madison" href="#/class/{{class.classname}}">
                             <div class="visual">
                                 <i class="fa fa-university fa-icon-medium"></i>
                             </div>
                             <div class="details">
                                 <div class="number">
-                                    <strong>{{class.classdata.length}}</strong>
+                                    <strong>{{class.total}}</strong>
                                 </div>
                                 <div class="desc">
                                     Total <strong>{{class.classname}}</strong>
@@ -49,10 +42,6 @@
                             </div>
                         </a>
                     </div>
-					<div class="progress" ng-show="hide_contain">
-					  <div class="progress-bar" role="progressbar" style="width: {{loading}}%;">
-					  </div>
-					</div>
                 </div>
             </div>
         </div>

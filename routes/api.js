@@ -54,61 +54,58 @@ exports.mobiapps = function(req, res) {
 exports.mobiapps_get = function(req, res) {
 
 	if (req.isAuthenticated()) {
-
-		args = {
-
-			//data:{test:"hello"}, // data passed to REST method (only useful in POST, PUT or PATCH methods) 
-			//path:{"id":120}, // path substitution var 
-			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
-			headers: {
-				"X-Parse-Email": parse_user,
-				"X-Parse-Password": parse_password,
-				"Content-Type": "application/json"
-
-			} // request headers 
-		};
+		
+		var parseAppIdUri = "https://api.parse.com/1/apps/" + req.params.mobiapp_id;
+		var args = { headers: { "X-Parse-Email": parse_user, "X-Parse-Password": parse_password, "Content-Type": "application/json"} };
 
 
-		client.get("https://api.parse.com/1/apps/" + req.params.mobiapp_id, args,
-			function(data, response) {
-				mapp = JSON.parse(data);
-
-
-				args = {
-					headers: {
-						"X-Parse-Application-Id": mapp.applicationId,
-						"X-Parse-Master-Key": mapp.masterKey,
-						"Content-Type": "application/json"
-					} // request headers 
-				};
-
-				client.get("https://api.parse.com/1/schemas", args, function(data, response) {
-					mschemas = JSON.parse(data);
-					parse.initialize(mapp.applicationId, mapp.javascriptKey, mapp.masterKey);
-					//res.json(mschemas.results);
-					var className = [];
-
-					_.each(mschemas.results, function(value, key) {
-						if (value.className != "_Installation") {
-							if (value.className != "_Session")
-								className.push({
-									className: value.className
-								});
-						}
-					});
-
-					res.json({
-						applicationId: mapp.applicationId,
-						javascriptKey: mapp.javascriptKey,
-						masterKey: mapp.masterKey,
-						classes: className
-					});
-
-
-				}).on('error', function(err) {
-					res.json('schemas: something went wrong on the request', err.request.options);
+		client.get(parseAppIdUri, args, function(data, response) {
+			var mapp = JSON.parse(data);
+			parse.initialize(mapp.applicationId, mapp.javascriptKey, mapp.masterKey);
+			var Core = parse.Object.extend("Core");
+			var query = new parse.Query(Core);
+			query.equalTo('active', true);
+			var total = [];
+			query.find().then(function(results) {
+				console.log("configuraciones encontradas: " + results.length);
+				var loop = [];
+				_.each(results, function(result){
+						var object = result;
+						var classname = object.get('class');
+						var clobj = parse.Object.extend(classname);
+						var query = new parse.Query(clobj);
+						loop.push(query);
 				});
+				return (loop);
+			}).then(function(querys){
+				var promise1 = parse.Promise.as();
+				_.each(querys, function(value){
+					promise1 = promise1.then(function() {
+						console.log('queries guardadas, guardando el resultado---: ' + value.className);
+						return value.count({
+								success: function(num) {
+								console.log({classname: value.className, total:num});
+								  total.push({classname: value.className, total:num});
+								},
+								error: function(error) {
+								  console.log(error);
+								}
+							});
+					});
+				});
+				 return promise1;
+			}).then(function(){
+				res.json(total);
+			});
+				
 
+/* 				res.json({
+					applicationId: mapp.applicationId,
+					javascriptKey: mapp.javascriptKey,
+					masterKey: mapp.masterKey,
+					classes: className
+				}); */
+			
 
 			}).on('error', function(err) {
 			res.json('something went wrong on the request', err.request.options);
@@ -223,21 +220,7 @@ exports.class_find_rows = function(req, res) {
 
 exports.prueba = function(req, res) {
 	
-	var results;
-	var includes = ['apunta'];
 
-	var Prueba = new parse.Object.extend("Prueba");
-	var query = new parse.Query(Prueba);
-	query.include(includes);
-
-	query.find().then(function(data) {
-		_.each(data, function(value, key) {
-			if (key == includes[0]) {
-				value = value.get('apunta');
-			}
-		});
-		res.json(data);
-	});
 
 };
 

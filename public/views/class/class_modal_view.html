@@ -19,7 +19,7 @@
 										<span ng-if="classConfig.type == 'Number' && classConfig.name == key">{{value}}</span>
 										<span ng-if="classConfig.type == 'Boolean' && classConfig.name == key">{{value}}</span>
 										<span ng-if="classConfig.type == 'GeoPoint' && classConfig.name == key">{{value}}</span>
-										<span ng-if="classConfig.type == 'File' && classConfig.name == key"><img class="img-responsive img-thumbnail" src="{{value.url}}" alt=""></span>
+										<span ng-if="classConfig.type == 'File' && classConfig.name == key"><div ng-if="value != null"><img class="img-responsive img-thumbnail" src="{{value.url}}" alt=""></div></span>
 										<span ng-if="classConfig.type == 'Date' && classConfig.name == key">{{value | date: 'short'}}</span>
 										<span ng-if="classConfig.type == 'Pointer' && classConfig.name == key" ng-init="loadSelect(classConfig.targetClass, value.objectId, classConfig.include)">
 											<span ng-repeat="(kk,vv) in selectChoices[classConfig.targetClass]">
