@@ -227,7 +227,7 @@ exports.prueba = function(req, res) {
 	var Entidad3 = parse.Object.extend("Entidad3");
 	var qe1 = [];var qe2 = [];var qe3 = [];
 	var r1 = []; var r2 = []; var r3 = [];
-	for(var i = 8001; i<= 10000; i++){
+	for(var i = 9001; i<= 10000; i++){
 		var entidad1 = new Entidad1();
 		var entidad2 = new Entidad2();
 		var entidad3 = new Entidad3();
@@ -256,7 +256,7 @@ exports.prueba = function(req, res) {
 			e1.save().then(function(){
 			console.log("guardado: " + e1.get('numero'));
 		});	 
-		}, 50);
+		}, 200);
 	}); 
 
 	res.json(qe1);
