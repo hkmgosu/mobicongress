@@ -259,7 +259,7 @@ exports.prueba = function(req, res) {
 		}, 50);
 	}); 
 
-	res.json('ño');
+	res.json(qe1);
 	
 	
 /* 	
