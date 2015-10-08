@@ -220,8 +220,101 @@ exports.class_find_rows = function(req, res) {
 
 exports.prueba = function(req, res) {
 	
+	parse.initialize('9tD2T3fGEHCRRsJC0d8gpoCUfO0YitjA57yh9zx0', 'vtDA5yKehtBTZRVsDU1oc3w7DCfbBg0G6QuZwqNM', 'ZZww6q3qf7IfTNQsSr9kpgX9BxfNs5jtGd1W1l6B');
+	
+	var Entidad1 = parse.Object.extend("Entidad1");
+	var Entidad2 = parse.Object.extend("Entidad2");
+	var Entidad3 = parse.Object.extend("Entidad3");
+	var qe1 = [];var qe2 = [];var qe3 = [];
+	var r1 = []; var r2 = []; var r3 = [];
+	for(var i = 8001; i<= 10000; i++){
+		var entidad1 = new Entidad1();
+		var entidad2 = new Entidad2();
+		var entidad3 = new Entidad3();
+		entidad1.set("texto", "objeto"+i);
+		entidad1.set("booleano",true);
+		entidad1.set("numero",i);
+		entidad1.set("fecha", new Date());
+		entidad1.set("keyValue",{ 'key': 'value'+i});
+		qe1.push(entidad1);
+		entidad2.set("texto", "objeto"+i);
+		entidad2.set("booleano",true);
+		entidad2.set("numero",i);
+		entidad2.set("fecha", new Date());
+		entidad2.set("keyValue",{ 'key': 'value'+i});
+		qe2.push(entidad2);
+		entidad3.set("texto", "objeto"+i);
+		entidad3.set("booleano",true);
+		entidad3.set("numero",i);
+		entidad3.set("fecha", new Date());
+		entidad3.set("keyValue",{ 'key': 'value'+i});
+		qe3.push(entidad3);
+	}
+	
+	_.each(qe1, function(e1){
+		setTimeout(function(){ 
+			e1.save().then(function(){
+			console.log("guardado: " + e1.get('numero'));
+		});	 
+		}, 50);
+	}); 
 
-
+	res.json('ño');
+	
+	
+/* 	
+var totalRows1 = [];
+var final1 = [];
+query1.count().then(function(num){
+		var total = num;
+		var limit = 1000;
+		var skip = 0;
+		var querys = [];
+		do{
+			if(total >= limit){
+				query1.limit(limit);
+				query1.skip(skip);
+				total = total - limit;
+				skip = skip + limit;
+				querys.push(query1);
+			}else
+			{
+				query1.limit(total);
+				total = 0;
+				querys.push(query1);
+			}
+		}while(total >= limit);
+		
+		return querys;
+	}).then(function(querys){
+		var promise1 = parse.Promise.as();
+			_.each(querys, function(value){
+				promise1 = promise1.then(function() {
+					console.log('queries guardadas, guardando el resultado---: ' + value.className);
+					return value.find({
+							success: function(data) {
+							console.log(data.length);
+							  totalRows1.push(data);
+							},
+							error: function(error) {
+							  console.log(error);
+							}
+						});
+				});
+			});
+		return promise1;
+	}).then(function(){
+		_.each(totalRows1, function(arrayData){
+			_.each(arrayData, function(row){
+				return final1.push(row);
+			});
+		});
+	}).then(function(){
+		console.log("filas Entidad1 extraidas exitosamente ---> " + final1.length);
+	}); */
+	
+	
+	
 };
 
 
