@@ -46,7 +46,7 @@ var multipartMiddleware = multipart();
 
 	app.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
 
-	app.post('/api/class_find_rows/', users.requiresLogin, api.class_find_rows);
+	app.get('/api/class_find_rows/:classname/:object_id', users.requiresLogin, api.class_find_rows);
 
 	app.post('/api/class_new_row', users.requiresLogin, multipartMiddleware, api.class_new_row);
 
@@ -59,6 +59,7 @@ var multipartMiddleware = multipart();
  	app.post('/test', multipartMiddleware, function(req, res, next) {
 		console.log(req.files);
 		res.json(JSON.parse(req.body.info));
-	}); 
+	});
+	 
 	
 }; 

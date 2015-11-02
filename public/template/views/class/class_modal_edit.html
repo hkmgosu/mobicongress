@@ -1,0 +1,130 @@
+<div class="panel panel-primary">
+	<div class="panel-heading">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">×</button>
+		<h4 class="panel-title"><span class="fa fa-edit"></span> Edit {{className}}</h4>
+	</div>
+	<form method="POST" ng-submit="createClassRow(className)" validate accept-charset="utf-8">
+		<div class="modal-body">
+			<div class="row">
+				<div ng-repeat="config in classConfig.details">
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'String' && config.inputType == 'text'">
+						<h5>{{config.name | capitalize}}</h5>
+						<input class="form-control" placeholder="{{config.name | capitalize}}" type="text" ng-model="classUpdateRow[className][config.name]"/>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'String' && config.inputType == 'textarea'">
+						<h5>{{config.name | capitalize}}</h5>
+						<textarea  class="form-control" rows="10" cols="100" ng-model="classUpdateRow[className][config.name]">
+						</textarea>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-6" ng-if="config.type == 'Date' && config.inputType == 'datetime-local'">
+						<h5>{{config.name | capitalize}} </h5>
+						<input class="form-control" type="datetime-local" ng-model="classUpdateRow[className][config.name]">
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'Pointer' && config.inputType == 'select'">
+						<h5>{{config.name | capitalize}} </h5>
+						<div class="col-lg-12 col-md-12 col-sm-12">
+							<div class="input-group">
+								<ui-select ng-model="classUpdateRow[className][config.name]" theme="bootstrap">
+								<ui-select-match placeholder="Select or search a {{config.name}} in the list...">	
+									<span ng-repeat="col in config.show.title.values">
+										<span ng-if="col.className == 'this'">{{$select.selected[col.columnName]}}</span>
+										<span ng-if="col.className != 'this'">{{$select.selected[col.className]}}</span>
+									</span>
+									<span ng-repeat="col in config.show.subTitle.values">
+										<span ng-if="col.className == 'this'">({{$select.selected[col.columnName]}})</span>
+										<span ng-if="col.className != 'this'">({{$select.selected[col.className]}})</span>
+									</span>
+								</ui-select-match>
+								<ui-select-choices repeat="row.objectId as row in selectData[config.targetClass] | filter: $select.search">
+									<span ng-repeat="col in config.show.title.values">
+										<span ng-if="col.className == 'this'">{{row[col.columnName]}}</span>
+										<span ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</span>
+									</span>
+									<span ng-repeat="col in config.show.subTitle.values">
+										<small ng-if="col.className == 'this'">{{row[col.columnName]}}</small>
+										<small ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</small>
+									</span>
+								</ui-select-choices>
+								</ui-select>
+								<span class="input-group-btn">
+								  <button ng-click="classUpdateRow[className][config.name] = undefined" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-trash"></span>
+								  </button>
+								</span>
+								<span class="input-group-btn">
+								  <button ng-click="create(config.targetClass)" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-plus"></span>
+								  </button>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'Array' && config.inputType == 'select'">
+						<h5>{{config.name | capitalize}} </h5>
+						<div class="col-lg-12 col-md-12 col-sm-12">
+							<div class="input-group">
+								<ui-select multiple ng-model="classUpdateRow[className][config.name]" theme="bootstrap" ng-init="classUpdateRow[className][config.name] = []">
+								<ui-select-match placeholder="Select or search {{config.name}} in the list...">	
+									<span ng-repeat="col in config.show.title.values">
+										<span ng-if="col.className == 'this'">{{$item[col.columnName]}}</span>
+										<span ng-if="col.className != 'this'">{{$item[col.className]}}</span>
+									</span>
+									<span ng-repeat="col in config.show.subTitle.values">
+										<span ng-if="col.className == 'this'">({{$item[col.columnName]}})</span>
+										<span ng-if="col.className != 'this'">({{$item[col.className]}})</span>
+									</span>
+								</ui-select-match>
+								<ui-select-choices repeat="row.objectId as row in selectData[config.targetClass] | filter: $select.search">
+									<span ng-repeat="col in config.show.title.values">
+										<span ng-if="col.className == 'this'">{{row[col.columnName]}}</span>
+										<span ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</span>
+									</span>
+									<span ng-repeat="col in config.show.subTitle.values">
+										<small ng-if="col.className == 'this'">{{row[col.columnName]}}</small>
+										<small ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</small>
+									</span>
+								</ui-select-choices>
+								</ui-select>
+								<span class="input-group-btn">
+								  <button ng-click="classUpdateRow[className][config.name] = undefined" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-trash"></span>
+								  </button>
+								</span>
+								<span class="input-group-btn">
+								  <button ng-click="create(config.targetClass)" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-plus"></span>
+								  </button>
+								</span>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'File' && config.inputType == 'file'">
+						<h5>{{config.name | capitalize}} </h5>
+						<input type="file" name="file" onchange="angular.element(this).scope().uploadFile(angular.element(this).scope().config.name, this.files)"/>
+						<p>{{file.name}}</p>
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'Number' && config.inputType == 'number'">
+						<h5>{{config.name | capitalize}} </h5>
+						<input type="number" class="form-control" ng-model="classUpdateRow[className][config.name]">
+					</div>
+					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'Boolean' && config.inputType == 'select'">
+						<h5>{{config.name | capitalize}} </h5>
+						<label class="radio-inline"><input ng-model="classUpdateRow[className][config.name]" type="radio" ng-value="true" ng-init="classUpdateRow[className][config.name] = true">True</label>
+						<label class="radio-inline"><input ng-model="classUpdateRow[className][config.name]" type="radio" ng-value="false">False</label>
+					</div>
+				</div>
+			</div>
+			<div>
+<!-- 				{{classUpdateRow}} -->
+			</div>
+		</div>
+	</form>
+		<div class="panel-footer" style="margin-bottom:-14px;">
+			<input type="submit" class="btn btn-success" value="Send" ng-click="createClassRow(className)" ng-disabled="saveDisabled"/>
+				<!--<span class="glyphicon glyphicon-ok"></span>-->
+			<input type="reset" class="btn btn-danger" value="Clear" ng-click="classUpdateRow[className] = undefined"/>
+				<!--<span class="glyphicon glyphicon-remove"></span>-->
+			<button style="float: right;" type="button" class="btn btn-default btn-close" data-dismiss="modal" ng-click="cancel()">Close</button>
+		</div>
+	</div>
+</div>

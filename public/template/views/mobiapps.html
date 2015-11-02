@@ -1,0 +1,94 @@
+<!-- BEGIN PAGE HEADER-->
+<h3 class="page-title">
+	MobiApps
+</h3>
+<div class="page-bar">
+	<ul class="page-breadcrumb">
+		<li>
+			<i class="fa fa-home"></i>
+			<a href="/#/dashboard.html">Dashboard</a>
+			<i class="fa fa-angle-right"></i>
+		</li>
+		<li>
+			MobiApps
+		</li>
+	</ul>
+<!-- 	<div class="page-toolbar">
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-fit-height grey-salt dropdown-toggle" data-toggle="dropdown" dropdown-menu-hover data-delay="1000" data-close-others="true">
+			Actions <i class="fa fa-angle-down"></i>
+			</button>
+			<ul class="dropdown-menu pull-right" role="menu">
+				<li>
+					<a href="#">
+					<i class="icon-user"></i> New User </a>
+				</li>
+				<li>
+					<a href="#">
+					<i class="icon-present"></i> New Event <span class="badge badge-success">4</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+					<i class="icon-basket"></i> New order </a>
+				</li>
+				<li class="divider">
+				</li>
+				<li>
+					<a href="#">
+					<i class="icon-flag"></i> Pending Orders <span class="badge badge-danger">4</span>
+					</a>
+				</li>
+				<li>
+					<a href="#">
+					<i class="icon-users"></i> Pending Users <span class="badge badge-warning">12</span>
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div> -->
+</div>
+<!-- END PAGE HEADER-->
+<!-- BEGIN MAIN CONTENT -->
+<div ng-controller="MobiAppController">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="portlet light">
+				<div class="portlet-title">
+<!-- 					<div class="caption">
+						<i class="fa fa-university font-green-sharp"></i>
+						<span class="caption-subject font-green-sharp bold uppercase">Apps</span>
+					</div> -->
+					<div class="inputs">
+						<div class="portlet-input input-medium input-inline">
+							<div class="input-icon right">
+								<i class="icon-magnifier"></i>
+								<input type="text" class="form-control form-control-solid" placeholder="search..." ng-model="query">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="portlet-body">
+					<div class="row">	
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="mapp in mapps | filter: query | orderBy: 'appName'">
+							<div class="dashboard-stat green-haze">
+								<div class="visual">
+									<i class="fa fa-globe"></i>
+								</div>
+								<div class="details">
+									<div class="number">
+										{{mapp.appName}}
+									</div>
+								</div>
+								<a class="more" href="#/mobiapp_classes/{{mapp.applicationId}}">
+								Load <i class="m-icon-swapright m-icon-white"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END MAIN CONTENT -->

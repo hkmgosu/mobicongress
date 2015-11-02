@@ -200,7 +200,7 @@ var Metronic = function() {
         if (!$().uniform) {
             return;
         }
-        var test = $("input[type=checkbox]:not(.toggle, .make-switch, .icheck), input[type=radio]:not(.toggle, .star, .make-switch, .icheck)");
+        var test = $("input[type=checkbox]:not(.toggle, .md-check, .md-radiobtn, .make-switch, .icheck), input[type=radio]:not(.toggle, .md-check, .md-radiobtn, .star, .make-switch, .icheck)");
         if (test.size() > 0) {
             test.each(function() {
                 if ($(this).parents(".checker").size() === 0) {
@@ -210,6 +210,81 @@ var Metronic = function() {
             });
         }
     };
+
+    // Handlesmaterial design checkboxes
+    var handleMaterialDesign = function() {
+
+        // Material design ckeckbox and radio effects
+        $('body').on('click', '.md-checkbox > label, .md-radio > label', function() {
+            var the = $(this);
+            // find the first span which is our circle/bubble
+            var el = $(this).children('span:first-child');
+              
+            // add the bubble class (we do this so it doesnt show on page load)
+            el.addClass('inc');
+              
+            // clone it
+            var newone = el.clone(true);  
+              
+            // add the cloned version before our original
+            el.before(newone);  
+              
+            // remove the original so that it is ready to run on next click
+            $("." + el.attr("class") + ":last", the).remove();
+        }); 
+
+        if ($('body').hasClass('page-md')) { 
+            // Material design click effect
+            // credit where credit's due; http://thecodeplayer.com/walkthrough/ripple-click-effect-google-material-design       
+            var element, circle, d, x, y;
+            $('body').on('click', 'a.btn, button.btn, input.btn, label.btn', function(e) { 
+                element = $(this);
+      
+                if(element.find(".md-click-circle").length == 0) {
+                    element.prepend("<span class='md-click-circle'></span>");
+                }
+                    
+                circle = element.find(".md-click-circle");
+                circle.removeClass("md-click-animate");
+                
+                if(!circle.height() && !circle.width()) {
+                    d = Math.max(element.outerWidth(), element.outerHeight());
+                    circle.css({height: d, width: d});
+                }
+                
+                x = e.pageX - element.offset().left - circle.width()/2;
+                y = e.pageY - element.offset().top - circle.height()/2;
+                
+                circle.css({top: y+'px', left: x+'px'}).addClass("md-click-animate");
+
+                setTimeout(function() {
+                    circle.remove();      
+                }, 1000);
+            });
+        }
+
+        // Floating labels
+        var handleInput = function(el) {
+            if (el.val() != "") {
+                el.addClass('edited');
+            } else {
+                el.removeClass('edited');
+            }
+        } 
+
+        $('body').on('keydown', '.form-md-floating-label .form-control', function(e) { 
+            handleInput($(this));
+        });
+        $('body').on('blur', '.form-md-floating-label .form-control', function(e) { 
+            handleInput($(this));
+        });        
+
+        $('.form-md-floating-label .form-control').each(function(){
+            if ($(this).val().length > 0) {
+                $(this).addClass('edited');
+            }
+        });
+    }
 
     // Handles custom checkboxes & radios using jQuery iCheck plugin
     var handleiCheck = function() {
@@ -244,6 +319,14 @@ var Metronic = function() {
         $('.make-switch').bootstrapSwitch();
     };
 
+    // Handles Bootstrap confirmations
+    var handleBootstrapConfirmation = function() {
+        if (!$().confirmation) {
+            return;
+        }
+        $('[data-toggle=confirmation]').confirmation({ container: 'body', btnOkClass: 'btn btn-sm btn-success', btnCancelClass: 'btn btn-sm btn-danger'});
+    }
+    
     // Handles Bootstrap Accordions.
     var handleAccordions = function() {
         $('body').on('shown.bs.collapse', '.accordion.scrollable', function(e) {
@@ -255,12 +338,18 @@ var Metronic = function() {
     var handleTabs = function() {
         //activate tab if tab id provided in the URL
         if (location.hash) {
-            var tabid = location.hash.substr(1);
+            var tabid = encodeURI(location.hash.substr(1));
             $('a[href="#' + tabid + '"]').parents('.tab-pane:hidden').each(function() {
                 var tabid = $(this).attr("id");
                 $('a[href="#' + tabid + '"]').click();
             });
             $('a[href="#' + tabid + '"]').click();
+        }
+
+        if ($().tabdrop) {
+            $('.tabbable-tabdrop .nav-pills, .tabbable-tabdrop .nav-tabs').tabdrop({
+                text: '<i class="fa fa-ellipsis-v"></i>&nbsp;<i class="fa fa-angle-down"></i>'
+            });
         }
     };
 
@@ -357,6 +446,13 @@ var Metronic = function() {
         });
     };
 
+    // Handle textarea autosize 
+    var handleTextareaAutosize = function() {
+        if (typeof(autosize) == "function") {
+            autosize(document.querySelector('textarea.autosizeme'));
+        }
+    }
+
     // Handles Bootstrap Popovers
 
     // last popep popover
@@ -437,6 +533,40 @@ var Metronic = function() {
         }
     };
 
+    // handle group element heights
+    var handleHeight = function() {
+       $('[data-auto-height]').each(function() {
+            var parent = $(this);
+            var items = $('[data-height]', parent);
+            var height = 0;
+            var mode = parent.attr('data-mode');
+            var offset = parseInt(parent.attr('data-offset') ? parent.attr('data-offset') : 0);
+
+            items.each(function() {
+                if ($(this).attr('data-height') == "height") {
+                    $(this).css('height', '');
+                } else {
+                    $(this).css('min-height', '');
+                }
+
+                var height_ = (mode == 'base-height' ? $(this).outerHeight() : $(this).outerHeight(true));
+                if (height_ > height) {
+                    height = height_;
+                }
+            });
+
+            height = height + offset;
+
+            items.each(function() {
+                if ($(this).attr('data-height') == "height") {
+                    $(this).css('height', height);
+                } else {
+                    $(this).css('min-height', height);
+                }
+            });
+       });       
+    }
+
     //* END:CORE HANDLERS *//
 
     return {
@@ -449,7 +579,8 @@ var Metronic = function() {
             handleInit(); // initialize core variables
             handleOnResize(); // set and handle responsive    
 
-            //UI Component handlers            
+            //UI Component handlers     
+            handleMaterialDesign(); // handle material design       
             handleUniform(); // hanfle custom radio & checkboxes
             handleiCheck(); // handles custom icheck radio and checkboxes
             handleBootstrapSwitch(); // handle bootstrap switch plugin
@@ -464,6 +595,12 @@ var Metronic = function() {
             handlePopovers(); // handles bootstrap popovers
             handleAccordions(); //handles accordions 
             handleModals(); // handle modals
+            handleBootstrapConfirmation(); // handle bootstrap confirmations
+            handleTextareaAutosize(); // handle autosize textareas
+
+            //Handle group element heights
+            handleHeight();
+            this.addResizeHandler(handleHeight); // handle auto calculating height on window resize
 
             // Hacks
             handleFixInputPlaceholderForIE(); //IE8 & IE9 input placeholder issue fix
@@ -482,6 +619,7 @@ var Metronic = function() {
             handleTooltips(); // handle bootstrap tooltips
             handlePopovers(); // handles bootstrap popovers
             handleAccordions(); //handles accordions 
+            handleBootstrapConfirmation(); // handle bootstrap confirmations
         },
 
         //init main components 
@@ -511,6 +649,10 @@ var Metronic = function() {
             if (el) {
                 if ($('body').hasClass('page-header-fixed')) {
                     pos = pos - $('.page-header').height();
+                } else if ($('body').hasClass('page-header-top-fixed')) {
+                    pos = pos - $('.page-header-top').height();
+                } else if ($('body').hasClass('page-header-menu-fixed')) {
+                    pos = pos - $('.page-header-menu').height();
                 }
                 pos = pos + (offeset ? offeset : -1 * el.height());
             }
@@ -862,6 +1004,18 @@ var Metronic = function() {
             } else {
                 return '';
             }
+        },
+
+        getResponsiveBreakpoint: function(size) {
+            // bootstrap responsive breakpoints
+            var sizes = {
+                'xs' : 480,     // extra small
+                'sm' : 768,     // small
+                'md' : 992,     // medium
+                'lg' : 1200     // large
+            };
+
+            return sizes[size] ? sizes[size] : 0; 
         }
     };
 
