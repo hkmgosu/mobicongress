@@ -56,7 +56,10 @@
 <!-- BEGIN MAIN CONTENT -->
 <div ng-controller="MobiAppClassController">
 	<div class="row">
-		<div class="col-md-12">
+		<div ng-hide="mobiAppClassLoaded" class="text-center">
+			<img src="./assets/admin/layout2/img/loading-spinner-blue.gif" alt=""/>
+		</div>
+		<div class="col-md-12" ng-show="mobiAppClassLoaded">
 			<div class="portlet light">
 				<div class="portlet-title">
 					<div class="inputs">
@@ -71,7 +74,7 @@
 				<div class="portlet-body">
 					<div class="row">
 						<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="class in schema_data | filter: query | orderBy: 'classname'">
-							<div class="dashboard-stat blue-madison">
+							<div class="dashboard-stat green-haze">
 								<div class="visual">
 									<i class="fa fa-university fa-icon-medium"></i>
 								</div>

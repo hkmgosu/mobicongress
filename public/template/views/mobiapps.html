@@ -52,7 +52,10 @@
 <!-- BEGIN MAIN CONTENT -->
 <div ng-controller="MobiAppController">
 	<div class="row">
-		<div class="col-md-12">
+		<div ng-hide="mobiAppLoaded" class="text-center">
+			<img src="./assets/admin/layout2/img/loading-spinner-blue.gif" alt=""/>
+		</div>
+		<div class="col-md-12" ng-show="mobiAppLoaded">
 			<div class="portlet light">
 				<div class="portlet-title">
 <!-- 					<div class="caption">
@@ -69,7 +72,7 @@
 					</div>
 				</div>
 				<div class="portlet-body">
-					<div class="row">	
+					<div class="row">
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 margin-bottom-10" ng-repeat="mapp in mapps | filter: query | orderBy: 'appName'">
 							<div class="dashboard-stat green-haze">
 								<div class="visual">

@@ -491,34 +491,6 @@ exports.class_new_row = function(req, res) {
 		var newRow = new clObj();
 		var classData = JSON.parse(req.body.data);
 		var classConfig = JSON.parse(req.body.config);
-
-		/*_.each(JSON.parse(req.body.config), function(value, key) {
-			if (_.has(value, "value")) {
-				if (value.type == 'String' && value.value !== null) {
-					new_row.set(key, value.value);
-				} else if (value.type == 'Date' && value.value !== null) {
-					new_row.set(key, new Date(value.value));
-				} else if (value.type == 'Pointer' && value.value !== null) {
-					new_row.set(key, {
-						"__type": value.type,
-						"className": value.targetClass,
-						"objectId": value.value
-					});
-				} else if (value.type == 'Array' && value.value !== null) {
-					if (value.value.length > 0) {
-						var tempArray = [];
-						for (var i = 0; i < value.value.length; i++) {
-							tempArray.push({
-								"__type": value.type,
-								"className": value.targetClass,
-								"objectId": value.value[i]
-							});
-						}
-						new_row.set(key, tempArray);
-					}
-				}
-			}
-		}); */
 		
 		_.each(classData, function(value, key){
 			var colConfig = _.where(classConfig.find.details, {name: key});
@@ -578,58 +550,67 @@ exports.class_new_row = function(req, res) {
 
 };
 
-
-
 exports.class_update_row = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		console.log(JSON.parse(req.body.info).objectId.value);
 		var Clobj = parse.Object.extend(req.body.classname);
 		var query = new parse.Query(Clobj);
+		var classData = JSON.parse(req.body.data);
+		var classConfig = JSON.parse(req.body.config);
 
-		query.get(JSON.parse(req.body.info).objectId.value, {
+		query.get(classData.objectId, {
 			success: function(classup) {
 				classup.save(null, {
-					success: function(new_row) {
+					success: function(updateRow) {
 
-						_.each(JSON.parse(req.body.info), function(value, key) {
-							if (_.has(value, "value")) {
-								if (value.type == 'String' && value.value !== null) {
-									new_row.set(key, value.value);
-								} else if (value.type == 'Date' && value.value !== null) {
-									new_row.set(key, new Date(value.value));
-								} else if (value.type == 'Pointer' && value.value !== null) {
-									new_row.set(key, {
-										"__type": value.type,
-										"className": value.targetClass,
-										"objectId": value.value
-									});
-								} else if (value.type == 'Array' && value.value !== null) {
-									if (value.value.length > 0) {
-										var tempArray = [];
-										for (var i = 0; i < value.value.length; i++) {
-											tempArray.push({
-												"__type": value.type,
-												"className": value.targetClass,
-												"objectId": value.value[i]
-											});
+					_.each(classData, function(value, key){
+							if(key != 'objectId'){
+								var colConfig = _.where(classConfig.find.details, {name: key});
+								if(colConfig[0] !== null){
+									var type = colConfig[0].type;
+									var target = colConfig[0].targetClass;
+
+									if(type == 'String' && value !== null){
+										updateRow.set(key, value);
+									} else if (type == 'Date' && value !== null) {
+										updateRow.set(key, new Date(value));
+									} else if (type == 'Pointer' && value !== null) {
+										updateRow.set(key, {
+											"__type": type,
+											"className": target,
+											"objectId": value
+										});
+									} else if (type == 'Array' && value !== null) {
+										if (value.length > 0) {
+											var tempArray = [];
+											for (var i = 0; i < value.length; i++) {
+												tempArray.push({
+													"__type": type,
+													"className": target,
+													"objectId": value[i]
+												});
+											}
+											updateRow.set(key, tempArray);
 										}
-										new_row.set(key, tempArray);
 									}
+
 								}
 							}
 						});
 
 						_.each(req.files, function(value, key){
+							console.log(req.files);
 							console.log(value.path);
-							var fileData = fs.readFileSync(value.path);
-							fileData = Array.prototype.slice.call(new Buffer(fileData), 0);
-							var parseFile = new parse.File(value.name, fileData);
-							new_row.set(key, parseFile);
+							if(value.path !== undefined){
+								var fileData = fs.readFileSync(value.path);
+								fileData = Array.prototype.slice.call(new Buffer(fileData), 0);
+								var parseFile = new parse.File(value.name, fileData);
+								updateRow.set(key, parseFile);
+							}
 
 						});
 
-						new_row.save().then(function(data) {
+						updateRow.save().then(function(data) {
 							res.json({type: 'success', title: 'SUCCESS!', detail: req.body.classname + ' guardado exitosamente'});
 						}, function(error) {
 							res.json({type: 'error', title: 'ERROR! no se ha guardado el objeto ' + req.body.classname, detail: "Error: " + error.code + " " + error.message});

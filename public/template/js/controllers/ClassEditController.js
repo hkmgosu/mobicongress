@@ -7,7 +7,6 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
 	$scope.className = $rootScope.modalClass;
 	$scope.objectId = $rootScope.modalClassObjectId;
 	$scope.classConfig = $rootScope.classConfig[$scope.className].find;
-    $scope.modalLoadStatus = true;
 	$scope.getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
 					'/api/class_find_rows/' + $scope.className + '/' + $scope.objectId;
 	$scope.classUpdateRow = {};
@@ -19,8 +18,8 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
         then(function(response) {
 			$scope.formData = {};
 			$scope.formData[$scope.className] = {};
-			$scope.modalLoadStatus = false;
           	$scope.status = response.status;
+			$scope.formData[$scope.className].objectId = response.data[0].objectId;
 			_.each($rootScope.classConfig[$scope.className].find.details, function(config){
 				if(config.type == 'Pointer' && _.has(response.data[0], config.name)){
 					$scope.formData[$scope.className][config.name] = response.data[0][config.name].objectId;
@@ -40,6 +39,7 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
          	$scope.data = response.data || "Request failed";
          	$scope.status = response.status;
      }).then(function(formData){
+		$scope.classUpdateRow[$scope.className].objectId = formData[$scope.className].objectId;
 		_.each($rootScope.classConfig[$scope.className].find.details, function(config){
 			if(config.type == 'Pointer' || config.type == 'Array'){
 				var getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
@@ -57,14 +57,15 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
 
 				$http.get(getLink).then(function(response){
 					$scope.selectData[config.targetClass] = response.data;
-					console.log(formData[$scope.className][config.name]);
 					$scope.classUpdateRow[$scope.className][config.name] = formData[$scope.className][config.name];
 					console.log('No existe DATA, carga en process...' + config.targetClass);
 				});
 				
 
-			}else{
+			}else if(config.type == 'Date'){
 				console.log(formData[$scope.className][config.name]);
+				$scope.classUpdateRow[$scope.className][config.name] = formData[$scope.className][config.name];
+			}else{
 				$scope.classUpdateRow[$scope.className][config.name] = formData[$scope.className][config.name];
 			}
 		});
@@ -120,7 +121,7 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
     
         $scope.createClassRow = function(name) {
             $scope.saveDisabled = true;
-			
+			console.log($scope.classUpdateRow[name]);
 			///// formeteo preguardado
 			
 				var fd = new FormData();
@@ -135,7 +136,7 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
             
 			//////////////////////////
 
-			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_new_row', fd, {
+			$http.post($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_update_row', fd, {
                 withCredentials: true,
                 headers: {
                     'Content-Type': undefined
