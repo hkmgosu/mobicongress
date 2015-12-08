@@ -6,13 +6,16 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
 	
 	$scope.className = $rootScope.modalClass;
 	$scope.objectId = $rootScope.modalClassObjectId;
-	$scope.classConfig = $rootScope.classConfig[$scope.className].find;
+	$scope.classConfig = $rootScope.classConfig;
 	$scope.getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
 					'/api/class_find_rows/' + $scope.className + '/' + $scope.objectId;
 	$scope.classUpdateRow = {};
+	$scope.classUpdateRow[$scope.className] = {};
 	$scope.selectData = {};
 	$scope.loadConfigs = {};
 	$scope.loadQueries = {};
+	
+	console.log($scope.classConfig);
 	
 	$http.get($scope.getLink).
         then(function(response) {
@@ -20,7 +23,7 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
 			$scope.formData[$scope.className] = {};
           	$scope.status = response.status;
 			$scope.formData[$scope.className].objectId = response.data[0].objectId;
-			_.each($rootScope.classConfig[$scope.className].find.details, function(config){
+			_.each($rootScope.classConfig[$scope.className].formConfig, function(config){
 				if(config.type == 'Pointer' && _.has(response.data[0], config.name)){
 					$scope.formData[$scope.className][config.name] = response.data[0][config.name].objectId;
 				}else if(config.type == 'Array'){
@@ -40,7 +43,7 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
          	$scope.status = response.status;
      }).then(function(formData){
 		$scope.classUpdateRow[$scope.className].objectId = formData[$scope.className].objectId;
-		_.each($rootScope.classConfig[$scope.className].find.details, function(config){
+		_.each($rootScope.classConfig[$scope.className].formConfig, function(config){
 			if(config.type == 'Pointer' || config.type == 'Array'){
 				var getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
 						  '/api/class_find_rows/' + config.targetClass + '/null';
@@ -119,7 +122,7 @@ MetronicApp.controller('ClassEditController', function($rootScope, $scope, $http
             });
         };
     
-        $scope.createClassRow = function(name) {
+        $scope.updateClassRow = function(name) {
             $scope.saveDisabled = true;
 			console.log($scope.classUpdateRow[name]);
 			///// formeteo preguardado

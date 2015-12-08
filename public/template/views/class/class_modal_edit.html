@@ -1,12 +1,12 @@
 <div class="panel panel-primary">
 	<div class="panel-heading">
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">×</button>
-		<h4 class="panel-title"><span class="fa fa-edit"></span> Edit {{className}}</h4>
+		<h4 class="panel-title"><span class="fa fa-plus"></span> Edit {{className}}</h4>
 	</div>
-	<form method="POST" ng-submit="createClassRow(className)" validate accept-charset="utf-8">
-		<div class="modal-body" ng-hide="modalLoadStatus">
+	<form method="POST" ng-submit="updateClassRow(className)" validate accept-charset="utf-8">
+		<div class="modal-body">
 			<div class="row">
-				<div ng-repeat="config in classConfig.details">
+				<div ng-repeat="config in classConfig[className].formConfig">
 					<div class="col-lg-12 col-md-12 col-sm-12" ng-if="config.type == 'String' && config.inputType == 'text'">
 						<h5>{{config.name | capitalize}}</h5>
 						<input class="form-control" placeholder="{{config.name | capitalize}}" type="text" ng-model="classUpdateRow[className][config.name]"/>
@@ -26,24 +26,28 @@
 							<div class="input-group">
 								<ui-select ng-model="classUpdateRow[className][config.name]" theme="bootstrap">
 								<ui-select-match placeholder="Select or search a {{config.name}} in the list...">	
-									<span ng-repeat="col in config.show.title.values">
-										<span ng-if="col.className == 'this'">{{$select.selected[col.columnName]}}</span>
-										<span ng-if="col.className != 'this'">{{$select.selected[col.className]}}</span>
+									<span ng-repeat="title in classConfig[config.targetClass].uiSelectConfig.title">	
+										<span ng-if="title.type == 'Pointer'">{{$select.selected[title.field].value.title}}</span>
+										<span ng-if="title.type == 'String'">{{$select.selected[title.field]}}</span>
+										<span ng-if="title.type == 'Date'">{{$select.selected[title.field] | date: 'shortDate'}}</span>
 									</span>
-									<span ng-repeat="col in config.show.subTitle.values">
-										<span ng-if="col.className == 'this'">({{$select.selected[col.columnName]}})</span>
-										<span ng-if="col.className != 'this'">({{$select.selected[col.className]}})</span>
-									</span>
+									<small ng-repeat="subTitle in classConfig[config.targetClass].uiSelectConfig.subTitle">
+										<small ng-if="subTitle.type == 'Pointer'">{{$select.selected[subTitle.field].value.subTitle}}</small>
+										<small ng-if="subTitle.type == 'String'">{{$select.selected[subTitle.field]}}</small>
+										<small ng-if="subTitle.type == 'Date'">{{$select.selected[subTitle.field] | date:'shortDate'}}</small>
+									</small>
 								</ui-select-match>
 								<ui-select-choices repeat="row.objectId as row in selectData[config.targetClass] | filter: $select.search">
-									<span ng-repeat="col in config.show.title.values">
-										<span ng-if="col.className == 'this'">{{row[col.columnName]}}</span>
-										<span ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</span>
+									<span ng-repeat="title in classConfig[config.targetClass].uiSelectConfig.title">	
+										<span ng-if="title.type == 'Pointer'">{{row[title.field].value.title}}</span>
+										<span ng-if="title.type == 'String'">{{row[title.field]}}</span>
+										<span ng-if="title.type == 'Date'">{{row[title.field] | date: 'shortDate'}}</span>
 									</span>
-									<span ng-repeat="col in config.show.subTitle.values">
-										<small ng-if="col.className == 'this'">{{row[col.columnName]}}</small>
-										<small ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</small>
-									</span>
+									<small ng-repeat="subTitle in classConfig[config.targetClass].uiSelectConfig.subTitle">	
+										<small ng-if="subTitle.type == 'Pointer'">{{row[subTitle.field].value.subTitle}}</small>
+										<small ng-if="subTitle.type == 'String'">{{row[subTitle.field]}}</small>
+										<small ng-if="subTitle.type == 'Date'">{{row[subTitle.field] | date:'shortDate'}}</small>
+									</small>
 								</ui-select-choices>
 								</ui-select>
 								<span class="input-group-btn">
@@ -64,26 +68,30 @@
 						<div class="col-lg-12 col-md-12 col-sm-12">
 							<div class="input-group">
 								<ui-select multiple ng-model="classUpdateRow[className][config.name]" theme="bootstrap" ng-init="classUpdateRow[className][config.name] = []">
-								<ui-select-match placeholder="Select or search {{config.name}} in the list...">	
-									<span ng-repeat="col in config.show.title.values">
-										<span ng-if="col.className == 'this'">{{$item[col.columnName]}}</span>
-										<span ng-if="col.className != 'this'">{{$item[col.className]}}</span>
-									</span>
-									<span ng-repeat="col in config.show.subTitle.values">
-										<span ng-if="col.className == 'this'">({{$item[col.columnName]}})</span>
-										<span ng-if="col.className != 'this'">({{$item[col.className]}})</span>
-									</span>
-								</ui-select-match>
-								<ui-select-choices repeat="row.objectId as row in selectData[config.targetClass] | filter: $select.search">
-									<span ng-repeat="col in config.show.title.values">
-										<span ng-if="col.className == 'this'">{{row[col.columnName]}}</span>
-										<span ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</span>
-									</span>
-									<span ng-repeat="col in config.show.subTitle.values">
-										<small ng-if="col.className == 'this'">{{row[col.columnName]}}</small>
-										<small ng-if="col.className != 'this'">{{row[col.className][col.columnName]}}</small>
-									</span>
-								</ui-select-choices>
+									<ui-select-match placeholder="Select or search a {{config.name}} in the list...">	
+										<span ng-repeat="title in classConfig[config.targetClass].uiSelectConfig.title">	
+											<span ng-if="title.type == 'Pointer'">{{$item[title.field].value.title}}</span>
+											<span ng-if="title.type == 'String'">{{$item[title.field]}}</span>
+											<span ng-if="title.type == 'Date'">{{$item[title.field] | date: 'shortDate'}}</span>
+										</span>
+										<small ng-repeat="subTitle in classConfig[config.targetClass].uiSelectConfig.subTitle">
+											<small ng-if="subTitle.type == 'Pointer'">{{$item[subTitle.field].value.subTitle}}</small>
+											<small ng-if="subTitle.type == 'String'">{{$item[subTitle.field]}}</small>
+											<small ng-if="subTitle.type == 'Date'">{{$item[subTitle.field] | date:'shortDate'}}</small>
+										</small>
+									</ui-select-match>
+									<ui-select-choices repeat="row.objectId as row in selectData[config.targetClass] | filter: $select.search">
+										<span ng-repeat="title in classConfig[config.targetClass].uiSelectConfig.title">	
+											<span ng-if="title.type == 'Pointer'">{{row[title.field].value.title}}</span>
+											<span ng-if="title.type == 'String'">{{row[title.field]}}</span>
+											<span ng-if="title.type == 'Date'">{{row[title.field] | date: 'shortDate'}}</span>
+										</span>
+									<small ng-repeat="subTitle in classConfig[config.targetClass].uiSelectConfig.subTitle">	
+										<small ng-if="subTitle.type == 'Pointer'">{{row[subTitle.field].value.subTitle}}</small>
+										<small ng-if="subTitle.type == 'String'">{{row[subTitle.field]}}</small>
+										<small ng-if="subTitle.type == 'Date'">{{row[subTitle.field] | date:'shortDate'}}</small>
+									</small>
+									</ui-select-choices>
 								</ui-select>
 								<span class="input-group-btn">
 								  <button ng-click="classUpdateRow[className][config.name] = undefined" class="btn btn-default" type="button">
@@ -120,7 +128,7 @@
 		</div>
 	</form>
 		<div class="panel-footer" style="margin-bottom:-14px;" ng-hide="modalLoadStatus">
-			<input type="submit" class="btn btn-success" value="Send" ng-click="createClassRow(className)" ng-disabled="saveDisabled"/>
+			<input type="submit" class="btn btn-success" value="Send" ng-click="updateClassRow(className)" ng-disabled="saveDisabled"/>
 				<!--<span class="glyphicon glyphicon-ok"></span>-->
 			<input type="reset" class="btn btn-danger" value="Clear" ng-click="classUpdateRow[className] = undefined"/>
 				<!--<span class="glyphicon glyphicon-remove"></span>-->

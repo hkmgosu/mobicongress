@@ -1,4 +1,4 @@
-MetronicApp.controller('MobiAppController', function($rootScope, $scope, $http, $timeout) {
+MetronicApp.controller('MobiAppController', function($rootScope, $scope, $http, $timeout, toaster) {
     $scope.$on('$viewContentLoaded', function() {   
         // initialize core components
         Metronic.initAjax();
@@ -7,7 +7,13 @@ MetronicApp.controller('MobiAppController', function($rootScope, $scope, $http, 
 		$http.get('/api/mobiapps').then(function(response){ 
 			$scope.mapps = response.data;
 			$scope.mobiAppLoaded = true;
-			console.log('mobiapp loaded');
+// 			toaster.pop({
+// 											type: 'note',
+// 											title: 'Cargado',
+// 											body: '<h4>apps cargadas exitosamente</h2>',
+// 											showCloseButton: true,
+// 											bodyOutputType: 'trustedHtml'
+// 							});
 		});
 		
     });

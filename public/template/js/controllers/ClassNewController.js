@@ -5,13 +5,13 @@ MetronicApp.controller('ClassNewController', function($rootScope, $scope, $http,
     /////////////////////////////////////////////// BEGIN CREATE FORM
 	
 	$scope.className = $rootScope.modalClass;
-	$scope.classConfig = $rootScope.classConfig[$scope.className].find;
+	$scope.classConfig = $rootScope.classConfig;
 	$scope.classNewRow = {};
 	$scope.selectData = {};
 	$scope.loadConfigs = {};
 	$scope.loadQueries = {};
 
-	_.each($rootScope.classConfig[$scope.className].find.details, function(config){
+	_.each($rootScope.classConfig[$scope.className].formConfig, function(config){
 		if(config.type == 'Pointer' || config.type == 'Array'){
 			var getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
 					  '/api/class_find_rows/' + config.targetClass + '/null';
@@ -27,12 +27,14 @@ MetronicApp.controller('ClassNewController', function($rootScope, $scope, $http,
 				});		
 			}
 			
-			if(!(_.has($scope.selectData, config.targetClass))){
+			
+			if(!(_.has($scope.selectData, config.targetClass)) && $rootScope.classConfig[config.targetClass] != null){
 				//$scope.loadQueries[config.targetClass] = $http.get(getLink);
 				$scope.selectData[config.targetClass] = null;
 				$http.get(getLink).then(function(response){
-					$scope.selectData[config.targetClass] = response.data;
-					console.log('No existe DATA, carga en process...' + config.targetClass);
+						$scope.selectData[config.targetClass] = response.data;
+						console.log(response.data);
+						console.log('No existe DATA, carga en process...' + config.targetClass);
 				});
 			}
 				

@@ -14,9 +14,9 @@ var parse_password = config.PARSE_ACCOUNT_PASSWORD;
 
 exports.prueba = function(req, res) {
 	
-	/* parse.initialize('a96tn47pbH5wTAVUSH0zid1hL4Auk35MF3hVgDGj', 'zSdHAQqmnBrQDk7YJFeN97m9mVZtOXGzPamI8wF0', 'qaOgONgVqDIOMZjvwB65mQwC6CIwswwCLB0a6Kd2');
 	
- 	var classname = req.body.classname;
+	
+ 	/*var classname = req.body.classname;
 	var promise = new parse.Promise.as();
 	promise.then(function(){
 		
@@ -300,6 +300,7 @@ exports.core_config = function(req, res) {
 
 		var Core = parse.Object.extend("Core");
 		var query = new parse.Query(Core);
+		query.equalTo('active', true);
 		query.find().then(function(results) {
 			var coreConfig = {};
 			_.each(results, function(config){
@@ -338,6 +339,7 @@ exports.mobiapps = function(req, res) {
 				res.json(mapps.results);
 
 			}).on('error', function(err) {
+			console.log('something went wrong on the request', err.request.options);
 			res.json('something went wrong on the request', err.request.options);
 		});
 
@@ -420,66 +422,120 @@ exports.class_find_rows = function(req, res) {
 
 	if (req.isAuthenticated()) {
 		
-	var classname = req.params.classname;
-	var promise = new parse.Promise.as();
-	promise.then(function(){
-		
-		var Core = parse.Object.extend("Core");
-		var query = new parse.Query(Core);
-		query.select("find");
-		query.equalTo("class", classname);
-		return query.find().then(function(results) {
-						console.log(classname);
-						var find = {};
-						if(results.length > 0){
-							find = results[0].get('find');
-						}
-						return find;
-				});
-		
-	}).then(function(find){
-		var parseObject = parse.Object.extend(classname);
-		var query = new parse.Query(parseObject);
-		if(_.has(req.params, "object_id")){
-		   if(req.params.object_id != 'null'){
-				query.equalTo("objectId", req.params.object_id);
+		var hasObjectId = false;
+		if(	_.has(req.params, "object_id") && req.params.object_id != 'null'){
+				 hasObjectId = true;
 			}
+		var classname = req.params.classname;
+		var promise = new parse.Promise.as();
+		
+		promise.then(function(){
+				var Core = parse.Object.extend("Core");
+				var query = new parse.Query(Core);
+				query.equalTo("class", classname);
+				return query.find().then(function(results) {
+								return { rowConfig: results[0].get('rowConfig') };
+						});
+		}).then(function(classConfig){
+				var parseObject = parse.Object.extend(classname);
+				var query = new parse.Query(parseObject);
+				if(hasObjectId){
+						query.equalTo("objectId", req.params.object_id);
+				}
+				_.each(classConfig.rowConfig, function(config){
+						if(config.type == 'Pointer' || config.type == 'Array'){
+								_.each(config.includes, function(include){
+									query.include(include);
+								});
+						}
+				});
+				query.limit(1000);
+				return query.find().then(function(result){
+					var final = [];
+					_.each(result, function(row){
+							var pass = {};
+							pass.objectId = row.id;
+							pass.createdAt = row.createdAt;
+							pass.updateAt = row.updatedAt;
+							_.each(classConfig.rowConfig, function(config){
+								if( config.type == 'Pointer' ){
+										if(row.get(config.name)){
+													var titleString = '';
+													var subTitleString = '';		
+													_.each(config.columns.title, function(title){
+															var temp = row;
+															_.each(title, function(col){
+																	if(temp){
+																			temp = temp.get(col);
+																	}
+															});
+															titleString = titleString + temp + ' ';
+													});
+													_.each(config.columns.subTitle, function(subTitle){
+															var temp = row;
+															_.each(subTitle, function(col){
+																	if(temp){
+																			temp = temp.get(col);
+																	}
+															});
+															subTitleString = subTitleString + temp + ' ';
+													});
+													pass[config.name] = { className: config.targetClass ,objectId: row.get(config.name).id, value: { title: titleString, subTitle: subTitleString } };
+										}
+								}else if( config.type == 'Array'){
+										pass[config.name] = [];
+										if(row.get(config.name)){
+												_.each(row.get(config.name), function(arrayRow){
+															console.log('controlando: ' + row.id);
+															if(arrayRow){
+																	var titleString = '';
+																	var subTitleString = '';	
+																	var temp;
+																	_.each(config.columns.title, function(title){
+																			temp = arrayRow;
+																			_.each(title, function(col){
+																					//console.log('columna Array titulo: ' + col);
+																					if(temp){
+																							temp = temp.get(col);
+																							console.log(temp);
+																					}
+																			});
+																			titleString = titleString + temp + ' ';
+																	});
+																	_.each(config.columns.subTitle, function(subTitle){
+																			temp = arrayRow;
+																			_.each(subTitle, function(col){
+																					console.log("columna Array subtitulo: " + col);
+																					if(temp){
+																							temp = temp.get(col);
+																					}
+																			});
+																			subTitleString = subTitleString + temp + ' ';
+																	});
+																	pass[config.name].push({ className: config.targetClass ,objectId: arrayRow.id, value: { title: titleString, subTitle: subTitleString } });
+														}
+												});	
+										}	
+									
+									
+									
+								}else{
+									pass[config.name] = row.get(config.name);
+								}
+							});
+							final.push(pass);
+					});
+					return final;
+				});
+		}).then(function(final){
+				res.json(final);
+		});
+
+
+
+		} else {
+			res.redirect('/signin');
 		}
-		query.limit(1000);
-		_.each(find.details, function(config){
-			if(config.type == 'Pointer'){
-				query.include(config.name);
-			}
-		});
-		return query.find().then(function(result){
-			var final = [];
-			_.each(result, function(row){
-				var pass = {};
-				pass.objectId = row.id;
-				pass.createdAt = row.createdAt;
-				pass.updateAt = row.updatedAt;
-				_.each(find.details, function(config){
-					if(config.type == 'Pointer'){
-						if(row.get(config.name) != null){
-							pass[config.name] = { className: config.targetClass ,objectId: row.get(config.name).id, value: row.get(config.name).get('name') };
-						}
-					}else{
-						pass[config.name] = row.get(config.name);
-					}
-				});
-				final.push(pass);
-			});
-			return final;
-		});
-	}).then(function(final){
-		res.json(final);
-	});
-		
-
-
-	} else {
-		res.redirect('/signin');
-	}
 
 };
 
@@ -491,35 +547,34 @@ exports.class_new_row = function(req, res) {
 		var newRow = new clObj();
 		var classData = JSON.parse(req.body.data);
 		var classConfig = JSON.parse(req.body.config);
-		
+		console.log(classData);
 		_.each(classData, function(value, key){
-			var colConfig = _.where(classConfig.find.details, {name: key});
+			var colConfig = _.where(classConfig.rowConfig, {name: key});
 			if(colConfig[0] !== null){
-				var type = colConfig[0].type;
-				var target = colConfig[0].targetClass;
-				
-				if(type == 'String' && value !== null){
+				if(colConfig[0].type == 'String' && value !== null){
 					newRow.set(key, value);
-				} else if (type == 'Date' && value !== null) {
+				} else if (colConfig[0].type == 'Date' && value !== null) {
 					newRow.set(key, new Date(value));
-				} else if (type == 'Pointer' && value !== null) {
+				} else if (colConfig[0].type == 'Pointer' && value !== null) {
 					newRow.set(key, {
-						"__type": type,
-						"className": target,
+						"__type": "Pointer",
+						"className": colConfig[0].targetClass,
 						"objectId": value
 					});
-				} else if (type == 'Array' && value !== null) {
+				} else if (colConfig[0].type == 'Array' && value !== null) {
 					if (value.length > 0) {
 						var tempArray = [];
-						for (var i = 0; i < value.length; i++) {
+						for (var i = 0; i < value.length; i++ ) {
 							tempArray.push({
-								"__type": type,
-								"className": target,
+								"__type": "Pointer",
+								"className": colConfig[0].targetClass,
 								"objectId": value[i]
 							});
 						}
 						newRow.set(key, tempArray);
 					}
+				} else if (value != null) {
+					 	newRow.set(key, value);
 				}
 				
 			}
@@ -565,28 +620,25 @@ exports.class_update_row = function(req, res) {
 
 					_.each(classData, function(value, key){
 							if(key != 'objectId'){
-								var colConfig = _.where(classConfig.find.details, {name: key});
+								var colConfig = _.where(classConfig.rowConfig, {name: key});
 								if(colConfig[0] !== null){
-									var type = colConfig[0].type;
-									var target = colConfig[0].targetClass;
-
-									if(type == 'String' && value !== null){
+									if(colConfig[0].type == 'String' && value !== null){
 										updateRow.set(key, value);
-									} else if (type == 'Date' && value !== null) {
+									} else if (colConfig[0].type == 'Date' && value !== null) {
 										updateRow.set(key, new Date(value));
-									} else if (type == 'Pointer' && value !== null) {
+									} else if (colConfig[0].type == 'Pointer' && value !== null) {
 										updateRow.set(key, {
-											"__type": type,
-											"className": target,
+											"__type": 'Pointer',
+											"className": colConfig[0].targetClass,
 											"objectId": value
 										});
-									} else if (type == 'Array' && value !== null) {
+									} else if (colConfig[0].type == 'Array' && value !== null) {
 										if (value.length > 0) {
 											var tempArray = [];
 											for (var i = 0; i < value.length; i++) {
 												tempArray.push({
-													"__type": type,
-													"className": target,
+													"__type": 'Pointer',
+													"className": colConfig[0].targetClass,
 													"objectId": value[i]
 												});
 											}

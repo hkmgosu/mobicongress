@@ -3,17 +3,16 @@ MetronicApp.controller('ClassViewController', function($rootScope, $scope, $http
     $rootScope.settings.layout.pageSidebarClosed = false;
     
     $scope.className = $rootScope.modalClass;
-	$scope.objectId = $rootScope.modalClassObjectId;
-	$scope.classConfig = $rootScope.classConfig[$scope.className].find;
-    $scope.modalLoadStatus = true;
-	$scope.getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
-					'/api/class_find_rows/' + $scope.className + '/' + $scope.objectId;
+		$scope.objectId = $rootScope.modalClassObjectId;
+		$scope.classConfig = $rootScope.classConfig;
+		$scope.getLink = $location.protocol() + '://' + $location.host() + ':' + $location.port() + 
+						'/api/class_find_rows/' + $scope.className + '/' + $scope.objectId;
     
 	$http.get($scope.getLink).
         then(function(response) {
-			$scope.modalLoadStatus = false;
           	$scope.status = response.status;
           	$scope.data = response.data[0];
+						console.log($scope.data);
         }, function(response) {
          	$scope.data = response.data || "Request failed";
          	$scope.status = response.status;
