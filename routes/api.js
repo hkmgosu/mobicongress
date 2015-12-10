@@ -14,6 +14,16 @@ var parse_password = config.PARSE_ACCOUNT_PASSWORD;
 
 exports.prueba = function(req, res) {
 	
+	parse.initialize('a96tn47pbH5wTAVUSH0zid1hL4Auk35MF3hVgDGj', 'zSdHAQqmnBrQDk7YJFeN97m9mVZtOXGzPamI8wF0', 'qaOgONgVqDIOMZjvwB65mQwC6CIwswwCLB0a6Kd2');
+	var parseObj = parse.Object.extend("Event");
+	var query = new parse.Query(parseObj);
+	query.include('place');
+	query.limit(1);
+	res.writeHead(200);
+	res.write('calculando');
+	req.on('end', function(){
+		res.send('onu').end();
+	});
 	
 	
  	/*var classname = req.body.classname;
@@ -367,7 +377,7 @@ exports.mobiapps_get = function(req, res) {
 			query.equalTo('active', true);
 			var total = [];
 			query.find().then(function(results) {
-				console.log("configuraciones encontradas: " + results.length);
+				//console.log("configuraciones encontradas: " + results.length);
 				var loop = [];
 				_.each(results, function(result){
 						var object = result;
@@ -381,7 +391,7 @@ exports.mobiapps_get = function(req, res) {
 				var promise1 = parse.Promise.as();
 				_.each(querys, function(value){
 					promise1 = promise1.then(function() {
-						console.log('queries guardadas, guardando el resultado---: ' + value.className);
+						//console.log('queries guardadas, guardando el resultado---: ' + value.className);
 						return value.count({
 								success: function(num) {
 								console.log({classname: value.className, total:num});
@@ -490,14 +500,13 @@ exports.class_find_rows = function(req, res) {
 															if(arrayRow){
 																	var titleString = '';
 																	var subTitleString = '';	
-																	var temp;
+																	var temp = null;
 																	_.each(config.columns.title, function(title){
 																			temp = arrayRow;
 																			_.each(title, function(col){
 																					//console.log('columna Array titulo: ' + col);
 																					if(temp){
 																							temp = temp.get(col);
-																							console.log(temp);
 																					}
 																			});
 																			titleString = titleString + temp + ' ';
@@ -688,7 +697,6 @@ exports.class_update_row = function(req, res) {
 	}
 
 };
-
 
 exports.class_delete_row = function(req, res) {
 
