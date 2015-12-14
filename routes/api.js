@@ -1,30 +1,21 @@
-var parse = require('parse').Parse;
 var config = require('../config/config');
+var parse = require('parse/node').Parse;
 var passport = require('passport');
 var _ = require('underscore');
-var moment = require('moment-timezone');
-var Client = require('node-rest-client').Client;
 var fs = require('fs');
-
-client = new Client();
-
-var parse_user = config.PARSE_ACCOUNT_USER;
-var parse_password = config.PARSE_ACCOUNT_PASSWORD;
-
+var url = require('url');
+var request = require('request');
 
 exports.prueba = function(req, res) {
 	
-	parse.initialize('a96tn47pbH5wTAVUSH0zid1hL4Auk35MF3hVgDGj', 'zSdHAQqmnBrQDk7YJFeN97m9mVZtOXGzPamI8wF0', 'qaOgONgVqDIOMZjvwB65mQwC6CIwswwCLB0a6Kd2');
-	var parseObj = parse.Object.extend("Event");
-	var query = new parse.Query(parseObj);
-	query.include('place');
-	query.limit(1);
-	res.writeHead(200);
-	res.write('calculando');
-	req.on('end', function(){
-		res.send('onu').end();
-	});
-	
+// 	parse.initialize('a96tn47pbH5wTAVUSH0zid1hL4Auk35MF3hVgDGj', 'zSdHAQqmnBrQDk7YJFeN97m9mVZtOXGzPamI8wF0', 'qaOgONgVqDIOMZjvwB65mQwC6CIwswwCLB0a6Kd2');
+// 	var parseObj = parse.Object.extend("Event");
+// 	var query = new parse.Query(parseObj);
+// 	query.include('place');
+// 	query.limit(1);
+// 	query.find().then(function(response){
+// 			res.render('test', { value: response });
+// 	});
 	
  	/*var classname = req.body.classname;
 	var promise = new parse.Promise.as();
@@ -328,31 +319,33 @@ exports.core_config = function(req, res) {
 exports.mobiapps = function(req, res) {
 
 	if (req.isAuthenticated()) {
-		var args;
-		args = {
+		
+			var parseUrl = "https://api.parse.com/1/apps";
+			var parseHeaders = {  "X-Parse-Email": config.PARSE_ACCOUNT_USER,
+														"X-Parse-Password": config.PARSE_ACCOUNT_PASSWORD,
+														"Content-Type": "application/json" };
+			var parseGet = { url: parseUrl, headers: parseHeaders };
+			var jsonString = '';
 
-			//data:{test:"hello"}, // data passed to REST method (only useful in POST, PUT or PATCH methods) 
-			//path:{"id":120}, // path substitution var 
-			//parameters:{arg1:"hello",arg2:"world"}, // query parameter substitution vars 
-			headers: {
-				"X-Parse-Email": parse_user,
-				"X-Parse-Password": parse_password,
-				"Content-Type": "application/json"
-
-			} // request headers 
-		};
-
-
-		client.get("https://api.parse.com/1/apps", args,
-			function(data, response) {
-				mapps = JSON.parse(data);
-				res.json(mapps.results);
-
-			}).on('error', function(err) {
-			console.log('something went wrong on the request', err.request.options);
-			res.json('something went wrong on the request', err.request.options);
-		});
-
+			request
+					.get( parseGet )
+					.on('response', function(response){
+							if(response.statusCode == 200){
+									console.log('Schema Get Success');
+							}else{
+									console.log(response.statusCode);
+							}
+					})
+					.on('data', function(data){
+							jsonString += data;
+					})
+					.on('end', function(){
+							res.json(JSON.parse(jsonString).results);
+					})
+					.on('error', function(error){
+							console.log(error);
+							res.end();
+					});
 
 
 	} else {
@@ -365,62 +358,73 @@ exports.mobiapps_get = function(req, res) {
 
 	if (req.isAuthenticated()) {
 		
-		var parseAppIdUri = "https://api.parse.com/1/apps/" + req.params.mobiapp_id;
-		var args = { headers: { "X-Parse-Email": parse_user, "X-Parse-Password": parse_password, "Content-Type": "application/json"} };
-
-
-		client.get(parseAppIdUri, args, function(data, response) {
-			var mapp = JSON.parse(data);
-			parse.initialize(mapp.applicationId, mapp.javascriptKey, mapp.masterKey);
-			var Core = parse.Object.extend("Core");
-			var query = new parse.Query(Core);
-			query.equalTo('active', true);
-			var total = [];
-			query.find().then(function(results) {
-				//console.log("configuraciones encontradas: " + results.length);
-				var loop = [];
-				_.each(results, function(result){
-						var object = result;
-						var classname = object.get('class');
-						var clobj = parse.Object.extend(classname);
-						var query = new parse.Query(clobj);
-						loop.push(query);
-				});
-				return (loop);
-			}).then(function(querys){
-				var promise1 = parse.Promise.as();
-				_.each(querys, function(value){
-					promise1 = promise1.then(function() {
-						//console.log('queries guardadas, guardando el resultado---: ' + value.className);
-						return value.count({
-								success: function(num) {
-								console.log({classname: value.className, total:num});
-								  total.push({classname: value.className, total:num});
-								},
-								error: function(error) {
-								  console.log(error);
-								}
-							});
+			var formatParseApp = function(mapp){
+				parse.initialize(mapp.applicationId, mapp.javascriptKey, mapp.masterKey);
+				var Core = parse.Object.extend("Core");
+				var query = new parse.Query(Core);
+				query.equalTo('active', true);
+				var total = [];
+				query.find().then(function(results) {
+					console.log("configuraciones encontradas: " + results.length);
+					var loop = [];
+					_.each(results, function(result){
+							var object = result;
+							var classname = object.get('class');
+							var clobj = parse.Object.extend(classname);
+							var query = new parse.Query(clobj);
+							loop.push(query);
 					});
+					return (loop);
+				}).then(function(querys){
+					var promise1 = parse.Promise.as();
+					_.each(querys, function(value){
+						promise1 = promise1.then(function() {
+							console.log('queries guardadas, guardando el resultado---: ' + value.className);
+							return value.count({
+									success: function(num) {
+									console.log({classname: value.className, total:num});
+										total.push({classname: value.className, total:num});
+									},
+									error: function(error) {
+										console.log(error);
+									}
+								});
+						});
+					});
+					 return promise1;
+				}).then(function(){
+					res.json(total);
 				});
-				 return promise1;
-			}).then(function(){
-				res.json(total);
-			});
-				
+		};
+		
+			var parseUrl = "https://api.parse.com/1/apps/" + req.params.mobiapp_id;
+			var parseHeaders = {  "X-Parse-Email": config.PARSE_ACCOUNT_USER,
+														"X-Parse-Password": config.PARSE_ACCOUNT_PASSWORD,
+														"Content-Type": "application/json" };
+			var parseGet = { url: parseUrl, headers: parseHeaders };
+			var jsonString = '';
 
-/* 				res.json({
-					applicationId: mapp.applicationId,
-					javascriptKey: mapp.javascriptKey,
-					masterKey: mapp.masterKey,
-					classes: className
-				}); */
-			
-
-			}).on('error', function(err) {
-			res.json('something went wrong on the request', err.request.options);
-		});
-
+			request
+					.get( parseGet )
+					.on('response', function(response){
+							if(response.statusCode == 200){
+									console.log('Schema Get Success');
+							}else{
+									console.log(response.statusCode);
+							}
+					})
+					.on('data', function(data){
+							jsonString += data;
+					})
+					.on('end', function(){
+							console.log(jsonString);
+							formatParseApp(JSON.parse(jsonString));
+					})
+					.on('error', function(error){
+							console.log(error);
+							res.end();
+					});
+		
 
 	} else {
 		res.json('/signin');
@@ -697,6 +701,7 @@ exports.class_update_row = function(req, res) {
 	}
 
 };
+
 
 exports.class_delete_row = function(req, res) {
 
