@@ -1,1 +1,1 @@
-web: node --debug=$PORT bin/www
+web: node bin/www
