@@ -1,4 +1,4 @@
-MetronicApp.controller('ClassViewController', function($rootScope, $scope, $http, $timeout, $location, $modal, $modalInstance, $log, items, _) {
+MetronicApp.controller('ClassViewController', function($rootScope, $scope, $http, $timeout, $location, $modal, $modalInstance, $log, _) {
     // set sidebar closed and body solid layout mode
     $rootScope.settings.layout.pageSidebarClosed = false;
     
