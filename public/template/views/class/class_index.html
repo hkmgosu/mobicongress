@@ -7,6 +7,9 @@
 <script type="text/ng-template" id="modalView">
 	<div ng-include="'./template/views/class/class_modal_view.html'"></div>
 </script>
+<script type="text/ng-template" id="modalDelete">
+	<div ng-include="'./template/views/class/class_modal_delete.html'"></div>
+</script>
 <!-- BEGIN PAGE HEADER-->
 <h3 class="page-title">
 	Class: {{className}}
@@ -27,7 +30,7 @@
 			<i class="fa fa-angle-right"></i>
 		</li>
 		<li>
-			<a href="javascript;" ng-click="reloadRoute">{{className}}</a>
+			<a href="javascript;" ng-click="loadGrid">{{className}}</a>
 		</li>
 	</ul>
 <!--<div class="page-toolbar">
