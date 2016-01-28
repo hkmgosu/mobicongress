@@ -16,6 +16,7 @@ MetronicApp.controller('ClassDeleteController', function($rootScope, $scope, $ht
 			console.log(status);
 			toaster.pop(data.type, data.title, data.detail);
 			$scope.borrarDisabled = false;
+			$modalInstance.dismiss('cancel');
 		}).
 		error(function(data, status, headers, config) {
 			console.log(data || "Request failed");
