@@ -59,13 +59,13 @@ MetronicApp.controller('ClassNewController', function($rootScope, $scope, $http,
 		modalInstance.result.then(function(result) {
 			console.log(result);
 			$scope.selectData[className] = null;
+		}, function() {
 			$http.get($location.protocol() + '://' + $location.host() + ':' + $location.port() +
 			'/api/class_find_rows/' + className + '/null').then(function(response) {
 				$scope.selectData[className] = response.data;
 				console.log(response.data);
 				console.log('No existe DATA, carga en process...' + className);
 			});
-		}, function() {
 			$log.info('Modal dismissed at: ' + new Date());
 		});
 	};
