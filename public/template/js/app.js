@@ -242,7 +242,8 @@ MetronicApp.config(['$stateProvider', '$urlRouterProvider', function($stateProvi
 								'./template/js/controllers/ClassEditController.js',
 								'./template/js/controllers/ClassViewController.js',
 								'./template/js/controllers/ClassNewController.js',
-								'./template/js/controllers/ClassDeleteController.js'
+								'./template/js/controllers/ClassDeleteController.js',
+								'./template/js/controllers/ClassGridController.js'
 							] 
 						}]);
 					}]

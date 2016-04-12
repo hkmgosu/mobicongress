@@ -24,13 +24,14 @@ MetronicApp.controller('ClassDeleteController', function($rootScope, $scope, $ht
 			toaster.pop(data.type, data.title, data.detail);
 		});
 
-		$scope.ok = function() {
+	};
+	
+	$scope.ok = function() {
 			$modalInstance.close($rootScope.modalClass);
 		};
 
-		$scope.cancel = function() {
-			$modalInstance.dismiss('cancel');
-		};
-
+	$scope.cancel = function() {
+		$modalInstance.dismiss('cancel');
 	};
+	
 });

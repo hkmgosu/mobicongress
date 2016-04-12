@@ -2,7 +2,7 @@ MetronicApp.controller('ClassController', function($rootScope, $scope, $http, $t
 	$scope.$on('$viewContentLoaded', function() {
 		// initialize core components
 		Metronic.initAjax();
-		
+
 		$scope.className = $stateParams.classname;
 		$scope.disabledOpenNew = true;
 		$scope.app_id = $stateParams.app_id;
@@ -35,7 +35,17 @@ MetronicApp.controller('ClassController', function($rootScope, $scope, $http, $t
 			return $http.get($location.protocol() + '://' + $location.host() + ':' + $location.port() + '/api/class_find_rows/' + $scope.className + '/null').
 			success(function(data, status, headers, config) {
 				_.each($rootScope.classConfig[$scope.className].uiGridConfig.columnDefs, function(cellConfig) {
-					if (cellConfig.type == 'Pointer') {
+					if (cellConfig.type == 'Array') {
+						$scope.gridOptions.columnDefs.push({
+							name: cellConfig.name,
+							field: cellConfig.field,
+							width: cellConfig.width,
+							enableFiltering: false,
+							cellTemplate: '<div class="ui-grid-cell-contents" ng-if="COL_FIELD != null">' +
+								'<a ng-if="COL_FIELD.length > 0" class="btn btn-outline btn-circle btn-xs green-haze" ng-click="grid.appScope.openGrid(grid.appScope.className, col.field, row.entity.objectId, COL_FIELD)"><span class="hidden-sm hidden-xs">{{COL_FIELD.length}}</span></a>' +
+								'</div>'
+						});
+					} else if (cellConfig.type == 'Pointer') {
 						$scope.gridOptions.columnDefs.push({
 							name: cellConfig.name,
 							field: cellConfig.field,
@@ -54,8 +64,7 @@ MetronicApp.controller('ClassController', function($rootScope, $scope, $http, $t
 								'<input class="form-control" type="text" ng-model="colFilter.term">' +
 								'</div>',
 							cellTemplate: '<div class="ui-grid-cell-contents" ng-if="COL_FIELD != null">' +
-								'{{COL_FIELD.value.title}}' +
-								'<button type="button" class="btn btn-circle green-haze btn-xs" ng-click="grid.appScope.openView(COL_FIELD.className, COL_FIELD.objectId)"><i class="fa fa-info"></i><span class="hidden-sm hidden-xs"></span></button>' +
+								' <a class="btn btn-outline btn-circle btn-xs green-haze" ng-click="grid.appScope.openView(COL_FIELD.className, COL_FIELD.objectId)"><span class="hidden-sm hidden-xs">{{COL_FIELD.value.title}}</span></a>' +
 								'</div>'
 						});
 					} else if (cellConfig.type == 'Date') {
@@ -216,9 +225,9 @@ MetronicApp.controller('ClassController', function($rootScope, $scope, $http, $t
 			$scope.gridApi.core.refresh();
 			$log.info('Modal dismissed at: ' + new Date());
 		});
-		
+
 	};
-	
+
 	$scope.openDelete = function(classname, objectId) {
 
 		$rootScope.modalClass = classname;
@@ -238,7 +247,29 @@ MetronicApp.controller('ClassController', function($rootScope, $scope, $http, $t
 			$scope.gridApi.core.refresh();
 			$log.info('Modal dismissed at: ' + new Date());
 		});
-		
+
+	};
+
+	$scope.openGrid = function(className, columnName, objectId, arrayData) {
+
+		var modalInstance = $modal.open({
+			animation: true,
+			templateUrl: 'modalGrid',
+			controller: 'ClassGridController',
+			size: '',
+			resolve: {
+				parentRowData: function(){
+					return { parentRow: { className: className, columnName: columnName, objectId: objectId }, arrayData: arrayData }
+				}
+			}
+		});
+
+		modalInstance.result.then(function(result) {
+			console.log(result);
+			$scope.gridApi.core.refresh();
+		}, function() {
+			$log.info('Modal dismissed at: ' + new Date());
+		});
 	};
 
 });

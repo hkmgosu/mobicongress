@@ -7,8 +7,8 @@ var router = express.Router();
 var multipart = require('connect-multiparty');
 var multipartMiddleware = multipart();
 
- module.exports = function(app){ 
-	
+module.exports = function(app) {
+
 	/* 	app.route('/signup')
 	.get(users.renderSignup)
 	.post(users.signup); */
@@ -46,7 +46,7 @@ var multipartMiddleware = multipart();
 
 	app.get('/api/mobiapps_get/:mobiapp_id', users.requiresLogin, api.mobiapps_get);
 
-	app.get('/api/class_find_rows/:classname/:object_id', users.requiresLogin, api.class_find_rows);
+	app.get('/api/class_find_rows/:classname/:object_id', api.class_find_rows);
 
 	app.post('/api/class_new_row', users.requiresLogin, multipartMiddleware, api.class_new_row);
 
@@ -54,12 +54,18 @@ var multipartMiddleware = multipart();
 
 	app.post('/api/class_delete_row/', users.requiresLogin, api.class_delete_row);
 
-	app.get('/api/prueba/', api.prueba);
+	app.post('/api/cluparco', users.requiresLogin, api.class_update_array_col);
+	
+	app.get('/api/clgearfo/:clna/:obid/:cona', api.class_get_array_formated);
 
- 	app.post('/test', multipartMiddleware, function(req, res, next) {
+	app.get('/api/prueba/', api.prueba);
+	
+	app.get('/api/crclco/:apna/:clna', api.create_class_config);
+
+	app.post('/test', multipartMiddleware, function(req, res, next) {
 		console.log(req.files);
 		res.json(JSON.parse(req.body.info));
 	});
-	 
-	
-}; 
+
+
+};
