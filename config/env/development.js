@@ -1,6 +1,6 @@
 module.exports = {
-	MONGOLAB_URI: process.env.MONGOLAB_URI,
-	PARSE_ACCOUNT_USER: process.env.PARSE_ACCOUNT_USER,
-	PARSE_ACCOUNT_PASSWORD: process.env.PARSE_ACCOUNT_PASSWORD,
+	MONGOLAB_URI: 'mongodb://admin:mobicongress0199@ds059692.mongolab.com:59692/mobicongress',
+	PARSE_ACCOUNT_USER: 'evolutionaimagos@gmail.com',
+	PARSE_ACCOUNT_PASSWORD: 'mobicongress0199',
 	sessionSecret: 'developmentSessionSecret'
 };

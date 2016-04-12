@@ -2,7 +2,7 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 
 	// set sidebar closed and body solid layout mode
 	$rootScope.settings.layout.pageSidebarClosed = false;
-	
+
 	$scope.className = parentRowData.parentRow.className;
 	$scope.columnName = parentRowData.parentRow.columnName;
 	$scope.objectId = parentRowData.parentRow.objectId;
@@ -14,13 +14,10 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 	$scope.selectDisabled = true;
 	$scope.selectData = [];
 	$scope.selectedItem = {};
-	
-	$scope.$watch('selectedItem', function() {
-        alert('hey, myVar has changed!');
-    });
+
 	
 	// logic
-	
+
 	$scope.load = function(){
 		$http.get($location.protocol() + '://' + $location.host() + ':' + $location.port() +
 			'/api/clgearfo/' + $scope.className + '/' + $scope.objectId + '/' + $scope.columnName).then(function(response) {
@@ -34,9 +31,9 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 			}, function(error){
 			console.log(error);
 		});
-		
+
 	};
-	
+
 	$scope.addItem = function(item){
 		var index = $scope.gridRows.indexOf(item);
 		$scope.gridRows.push(item);
@@ -65,9 +62,9 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 			toaster.pop("error", "Error", "Request failed");
 			$scope.gridRows.splice(index,1);
 		});
-		
+
 	};
-	
+
 	$scope.removeItem = function(item){
 		var index = $scope.gridRows.indexOf(item);
 		var tempItem = $scope.gridRows[index];
@@ -98,9 +95,9 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 			toaster.pop("error", "Error", "Request failed");
 			$scope.gridRows.push(tempItem);
 		});
-		
+
 	};
-	
+
 	$scope.checkingItems = function(selectItems, tableItems){
 		 console.log("items en select: " + selectItems.length);
 		console.log("items en tabla: " + tableItems.length);
@@ -112,28 +109,28 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 				}
 		});
 		console.log($scope.gridRows);
-		
+
 	};
-	
+
 	$scope.checkingButtons = function(){
 		console.log('checking');
 		if($scope.selectedItem != {}){
 			$scope.addButtonDisabled = false;
 			$scope.removeSelectItemDisabled= false;
-			
+
 		}
-		else{ 
+		else{
 			$scope.addButtonDisabled = true;
 			$scope.removeSelectItemDisabled = true;
 		}
 	};
-	
+
 	$scope.removeSelectItem = function(){
 		$scope.selectedItem = {};
 		$scope.checkingButtons();
 	}
-	
-	//////////////////////////////////////////////////// Modal Functions 
+
+	//////////////////////////////////////////////////// Modal Functions
 
 	$scope.ok = function() {
 		$modalInstance.close($rootScope.modalClass);
@@ -190,7 +187,7 @@ MetronicApp.controller('ClassGridController', function($rootScope, $scope, $http
 			$log.info('Modal dismissed at: ' + new Date());
 		});
 	};
-	
+
 	$scope.openDelete = function(classname, objectId) {
 
 		$rootScope.modalClass = classname;
